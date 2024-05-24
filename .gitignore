@@ -51,3 +51,4 @@ qtcreator-*
 CATKIN_IGNORE
 
 CMakeLists.txt
+.mypy_cache
