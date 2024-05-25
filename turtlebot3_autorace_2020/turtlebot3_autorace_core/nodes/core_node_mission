@@ -81,7 +81,7 @@ class ControlMission():
 
         traffic_stop_path = model_dir_path + '/traffic_stop/model.sdf'
         traffic_stop_model = open(traffic_stop_path, 'r')
-        self.traffic_stop_model = traffic_stop_path.read()
+        self.traffic_stop_model = traffic_stop_model.read()
 
         up_bar_path = model_dir_path + '/traffic_bar_up/model.sdf'
         up_bar_model = open(up_bar_path, 'r')
