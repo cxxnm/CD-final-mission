@@ -3,7 +3,7 @@
   <model name="traffic_stop">
     <static>true</static>
     <link name="box">
-      <pose>-0.33 0.92 0.13 0 0 0</pose>
+      <pose>-0.33 0.92 0 0 0 -1.58</pose>
       <collision name="collision">
         <geometry>
           <box>
