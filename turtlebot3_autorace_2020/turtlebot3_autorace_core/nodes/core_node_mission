@@ -87,7 +87,7 @@ class ControlMission():
         up_bar_model = open(up_bar_path, 'r')
         self.up_bar_model = up_bar_model.read()
 
-        traffic_parking_path = model_dir_path + '/ttraffic_parking/model.sdf'
+        traffic_parking_path = model_dir_path + '/traffic_parking/model.sdf'
         traffic_parking_model = open(traffic_parking_path, 'r')
         self.traffic_parking_model = traffic_parking_model.read()
 
