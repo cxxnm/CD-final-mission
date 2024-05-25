@@ -97,24 +97,24 @@ class ControlMission():
     def setTraffic(self):
         rospy.wait_for_service('gazebo/spawn_sdf_model')
         spawn_model_prox = rospy.ServiceProxy('gazebo/spawn_sdf_model', SpawnModel)
-        spawn_model_prox(
-            'traffic_left',
-            self.traffic_left_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
-        spawn_model_prox(
-            'traffic_right',
-            self.traffic_right_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
-        spawn_model_prox(
-            'down_bar',
-            self.down_bar_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
+        # spawn_model_prox(
+        #     'traffic_left',
+        #     self.traffic_left_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
+        # spawn_model_prox(
+        #     'traffic_right',
+        #     self.traffic_right_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
+        # spawn_model_prox(
+        #     'down_bar',
+        #     self.down_bar_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
 
         parking_pose = Pose()
         parking_stop = np.random.rand()
