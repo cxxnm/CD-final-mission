@@ -3,7 +3,7 @@
   <model name="traffic_parking">
     <static>true</static>
     <link name="box">
-      <pose>-0.13 -1.63 0.13 0 0 0</pose>
+      <pose>-0.14 -1.64 0 0 0 1.57</pose>
       <collision name="collision">
         <geometry>
           <box>
