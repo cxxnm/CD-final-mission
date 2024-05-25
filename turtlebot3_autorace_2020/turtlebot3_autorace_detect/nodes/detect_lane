@@ -78,7 +78,8 @@ class DetectLane():
         self.window_width = 1000.
         self.window_height = 600.
 
-        self.reliability_yellow_line = 100
+        self.reliability_yellow_left_line = 100
+        self.reliability_yellow_right_line = 100
 
     def cbGetDetectLaneParam(self, config, level):
         rospy.loginfo("[Detect Lane] Detect Lane Calibration Parameter reconfigured to")
@@ -116,8 +117,8 @@ class DetectLane():
             cv_image = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
         # find White and Yellow Lanes
-        yellow_fraction_right, cv_yellow_lane_right = self.maskYellowLane(cv_image)
-        yellow_fraction_left, cv_yellow_lane_left = self.maskYellowLane(cv_image)
+        yellow_fraction_right, cv_yellow_lane_right = self.maskYellowRightLane(cv_image)
+        yellow_fraction_left, cv_yellow_lane_left = self.maskYellowLeftLane(cv_image)
 
         try:
             if yellow_fraction_left > 3000:
@@ -153,7 +154,7 @@ class DetectLane():
 
         self.make_lane(cv_image, yellow_fraction_right, yellow_fraction_left)
 
-    def maskYellowLane(self, image):
+    def maskYellowLeftLane(self, image):
         # Convert BGR to HSV
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -193,14 +194,76 @@ class DetectLane():
         how_much_short = 600 - how_much_short
 
         if how_much_short > 100:
-            if self.reliability_yellow_line >= 5:
-                self.reliability_yellow_line -= 5
+            if self.reliability_yellow_left_line >= 5:
+                self.reliability_yellow_left_line -= 5
+
         elif how_much_short <= 100:
-            if self.reliability_yellow_line <= 99:
-                self.reliability_yellow_line += 5
+            if self.reliability_yellow_left_line <= 99:
+                self.reliability_yellow_left_line += 5
 
         msg_yellow_line_reliability = UInt8()
-        msg_yellow_line_reliability.data = self.reliability_yellow_line
+        msg_yellow_line_reliability.data = self.reliability_yellow_left_line
+        self.pub_yellow_line_reliability.publish(msg_yellow_line_reliability)
+
+        if self.is_calibration_mode == True:
+            if self.pub_image_type == "compressed":
+                # publishes yellow lane filtered image in compressed type
+                self.pub_image_yellow_lane.publish(self.cvBridge.cv2_to_compressed_imgmsg(mask, "jpg"))
+
+            elif self.pub_image_type == "raw":
+                # publishes yellow lane filtered image in raw type
+                self.pub_image_yellow_lane.publish(self.cvBridge.cv2_to_imgmsg(mask, "bgr8"))
+
+        return fraction_num, mask
+    
+    def maskYellowRightLane(self, image):
+        # Convert BGR to HSV
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        Hue_l = self.hue_yellow_l
+        Hue_h = self.hue_yellow_h
+        Saturation_l = self.saturation_yellow_l
+        Saturation_h = self.saturation_yellow_h
+        Lightness_l = self.lightness_yellow_l
+        Lightness_h = self.lightness_yellow_h
+
+        # define range of white color in HSV
+        lower_yellow = np.array([Hue_l, Saturation_l, Lightness_l])
+        upper_yellow = np.array([Hue_h, Saturation_h, Lightness_h])
+
+        # Threshold the HSV image to get only yellow colors
+        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+
+        # Bitwise-AND mask and original image
+        res = cv2.bitwise_and(image, image, mask = mask)
+
+        fraction_num = np.count_nonzero(mask)
+
+        if self.is_calibration_mode == False:
+            if fraction_num > 35000:
+                if self.lightness_yellow_l < 250:
+                    self.lightness_yellow_l += 5
+            elif fraction_num < 5000:
+                if self.lightness_yellow_l > 50:
+                    self.lightness_yellow_l -= 5
+
+        how_much_short = 0
+
+        for i in range(0, 600):
+            if np.count_nonzero(mask[i,::]) > 0:
+                how_much_short += 1
+
+        how_much_short = 600 - how_much_short
+
+        if how_much_short > 100:
+            if self.reliability_yellow_right_line >= 5:
+                self.reliability_yellow_right_line -= 5
+        elif how_much_short <= 100:
+            if self.reliability_yellow_right_line <= 99:
+                self.reliability_yellow_right_line += 5
+
+        msg_yellow_line_reliability = UInt8()
+        msg_yellow_line_reliability.data = self.reliability_yellow_right_line
         self.pub_yellow_line_reliability.publish(msg_yellow_line_reliability)
 
         if self.is_calibration_mode == True:
@@ -316,62 +379,83 @@ class DetectLane():
         return lane_fitx, lane_fit
 
     def make_lane(self, cv_image, yellow_fraction_right, yellow_fraction_left):
+        # Create an image to draw the lines on
         warp_zero = np.zeros((cv_image.shape[0], cv_image.shape[1], 1), dtype=np.uint8)
+
         color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
         color_warp_lines = np.dstack((warp_zero, warp_zero, warp_zero))
-    
+
         ploty = np.linspace(0, cv_image.shape[0] - 1, cv_image.shape[0])
-    
-        left_lane_detected = yellow_fraction_left > 3000
-        right_lane_detected = yellow_fraction_right > 3000
-    
-        if left_lane_detected:
+
+        if yellow_fraction_left > 3000:
             pts_left = np.array([np.flipud(np.transpose(np.vstack([self.left_fitx, ploty])))])
             cv2.polylines(color_warp_lines, np.int_([pts_left]), isClosed=False, color=(0, 0, 255), thickness=25)
-    
-        if right_lane_detected:
+
+        if yellow_fraction_right > 3000:
             pts_right = np.array([np.transpose(np.vstack([self.right_fitx, ploty]))])
             cv2.polylines(color_warp_lines, np.int_([pts_right]), isClosed=False, color=(255, 255, 0), thickness=25)
         
         self.is_center_x_exist = True
-    
-        if self.reliability_yellow_line > 50:
-            if left_lane_detected and right_lane_detected:
+
+        if self.reliability_yellow_right_line > 50 and self.reliability_yellow_left_line > 50:   
+            if yellow_fraction_right > 3000 and yellow_fraction_left > 3000:
                 centerx = np.mean([self.left_fitx, self.right_fitx], axis=0)
                 pts = np.hstack((pts_left, pts_right))
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-    
+
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+
+                # Draw the lane onto the warped blank image
                 cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
-            elif right_lane_detected:
+
+            if yellow_fraction_right > 3000 and yellow_fraction_left <= 3000:
                 centerx = np.subtract(self.right_fitx, 320)
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-    
+
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
-            elif left_lane_detected:
+
+            if yellow_fraction_right <= 3000 and yellow_fraction_left > 3000:
                 centerx = np.add(self.left_fitx, 320)
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-    
+
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
-            else:
-                self.is_center_x_exist = False
+
+        elif self.reliability_yellow_right_line <= 50 and self.reliability_yellow_left_line > 50:
+            centerx = np.add(self.left_fitx, 320)
+            pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
+
+            cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+
+        elif self.reliability_yellow_right_line > 50 and self.reliability_yellow_left_line <= 50:
+            centerx = np.subtract(self.right_fitx, 320)
+            pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
+
+            cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+
         else:
             self.is_center_x_exist = False
-    
+            pass
+
+        # Combine the result with the original image
         final = cv2.addWeighted(cv_image, 1, color_warp, 0.2, 0)
         final = cv2.addWeighted(final, 1, color_warp_lines, 1, 0)
-    
+
         if self.pub_image_type == "compressed":
-            if self.is_center_x_exist:
+            if self.is_center_x_exist == True:
+                # publishes lane center
                 msg_desired_center = Float64()
                 msg_desired_center.data = centerx.item(350)
                 self.pub_lane.publish(msg_desired_center)
+
             self.pub_image_lane.publish(self.cvBridge.cv2_to_compressed_imgmsg(final, "jpg"))
+
         elif self.pub_image_type == "raw":
-            if self.is_center_x_exist:
+            if self.is_center_x_exist == True:
+                # publishes lane center
                 msg_desired_center = Float64()
                 msg_desired_center.data = centerx.item(350)
                 self.pub_lane.publish(msg_desired_center)
+
             self.pub_image_lane.publish(self.cvBridge.cv2_to_imgmsg(final, "bgr8"))
 
     def main(self):
