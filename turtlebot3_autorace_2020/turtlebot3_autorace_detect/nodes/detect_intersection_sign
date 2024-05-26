@@ -165,6 +165,10 @@ class DetectSign:
                 rospy.loginfo("detect circle sign")
                 image_out_num = 2
 
+        else:
+            matches_circle = None
+            # rospy.loginfo("nothing detected")
+
         good_left = []
         for m, n in matches_left:
             if m.distance < 0.7 * n.distance:

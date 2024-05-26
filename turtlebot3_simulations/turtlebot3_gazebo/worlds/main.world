@@ -186,28 +186,28 @@
       </spot>
     </light>
     <state world_name='default'>
-      <sim_time>2783 870000000</sim_time>
-      <real_time>164 976012874</real_time>
-      <wall_time>1716740203 526569450</wall_time>
-      <iterations>161945</iterations>
+      <sim_time>2982 768000000</sim_time>
+      <real_time>77 596876152</real_time>
+      <wall_time>1716746543 188308100</wall_time>
+      <iterations>76917</iterations>
       <model name='autorace'>
-        <pose>-1.86764 1.58225 -0.001061 -2e-06 -0.00464 0.003875</pose>
+        <pose>-1.86775 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose>-1.86764 1.58225 -0.001061 -2e-06 -0.00464 0.003875</pose>
-          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.3e-05 2e-06</velocity>
-          <acceleration>-0 0 -0 0 -0 0</acceleration>
-          <wrench>-0 0 -0 0 -0 0</wrench>
+          <pose>-1.86775 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
+          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.1e-05 2e-06</velocity>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose>-1.8681 1.66225 0.031938 -1.5707 -0.367083 0.003839</pose>
-          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.6e-05 -0</velocity>
+          <pose>-1.86821 1.66225 0.031938 -1.57069 -0.370575 0.003841</pose>
+          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.4e-05 -1e-06</velocity>
           <acceleration>-0 0 -0 0 -0 0</acceleration>
           <wrench>-0 0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose>-1.86748 1.50225 0.031938 -1.5707 -0.347731 0.003841</pose>
-          <velocity>-2.8e-05 0 7e-05 -1.5e-05 -7.3e-05 -1e-06</velocity>
+          <pose>-1.86759 1.50225 0.031938 -1.5707 -0.351199 0.003844</pose>
+          <velocity>-2.8e-05 0 7e-05 -1.5e-05 -7.1e-05 -1e-06</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
@@ -242,8 +242,18 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
+      <model name='traffic_construction'>
+        <pose>-2.18917 -0.930038 0.040254 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='box'>
+          <pose>-0.989165 0.069962 0.040254 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
       <model name='traffic_left'>
-        <pose>0.034698 -0.288835 0.051324 0 -0 0</pose>
+        <pose>0.0347 -0.28884 0.051324 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='box'>
           <pose>-1.1753 -1.37884 0.051324 0 -0 0</pose>
@@ -273,13 +283,13 @@
         </link>
       </model>
       <model name='unit_box'>
-        <pose>-0.998552 -0.107632 0.114369 -1e-06 -3e-06 2e-06</pose>
-        <scale>0.238301 0.144323 0.228737</scale>
+        <pose>-0.987155 -0.146803 0.146678 4e-06 4e-06 7.1e-05</pose>
+        <scale>0.056962 0.029385 0.067102</scale>
         <link name='link'>
-          <pose>-0.998552 -0.107632 0.114369 -1e-06 -3e-06 2e-06</pose>
+          <pose>-0.987155 -0.146803 0.146678 4e-06 4e-06 7.1e-05</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.903366 -0.547109 2.11585 1.64213 1.52608 3.14159</acceleration>
-          <wrench>0.903366 -0.547109 2.11585 0 -0 0</wrench>
+          <acceleration>0.673833 -0.573877 -2.56715 0.770881 -1.45234 3.14159</acceleration>
+          <wrench>0.673833 -0.573877 -2.56715 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -309,7 +319,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-0.773357 -0.195348 4.50994 3.14159 1.57079 3.14159</pose>
+        <pose>-0.645859 0.133994 6.50716 3.14159 1.57079 3.14159</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -771,7 +781,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.999996 1 1</size>
+              <size>4.19637 6.92889 4.37183</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -791,7 +801,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.999996 1 1</size>
+              <size>4.19637 6.92889 4.37183</size>
             </box>
           </geometry>
           <material>
@@ -994,6 +1004,11 @@
       </attenuation>
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
     </light>
     <light name='user_point_light_4' type='point'>
       <pose>-6.90658 1.43848 1 0 -0 0</pose>
@@ -1007,6 +1022,11 @@
       </attenuation>
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
     </light>
     <light name='user_spot_light_0' type='spot'>
       <pose>-1.76686 1.34263 1 0 -0 0</pose>
@@ -1038,6 +1058,55 @@
       </attenuation>
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
     </light>
+    <model name='traffic_construction'>
+      <static>1</static>
+      <link name='box'>
+        <pose>1.2 1 0 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.12 0.025 0.25</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.12 0.025 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://turtlebot3_autorace_2020/traffic_construction/materials/scripts</uri>
+              <uri>model://turtlebot3_autorace_2020/traffic_construction/materials/textures</uri>
+              <name>traffic_construction</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0 0 0 0 -0 0</pose>
+    </model>
   </world>
 </sdf>
