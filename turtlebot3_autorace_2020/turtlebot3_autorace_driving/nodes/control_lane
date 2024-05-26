@@ -28,6 +28,7 @@ from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 from std_srvs.srv import Empty
+from geometry_msgs.msg import Pose
 from nav_msgs.msg import Odometry
 
 class ControlLane():
@@ -65,11 +66,6 @@ class ControlLane():
 
     def loadMissionModel(self):
         model_dir_path = os.path.dirname(os.path.realpath(__file__))
-        print("--------")
-        print("--------")
-        print(model_dir_path)
-        print("--------")
-        print("--------")
         model_dir_path = model_dir_path.replace(
             '/turtlebot3_autorace_2020/turtlebot3_autorace_driving/nodes',
             '/turtlebot3_simulations/turtlebot3_gazebo/models/turtlebot3_autorace_2020')
