@@ -54,8 +54,6 @@ catkin_install_python(PROGRAMS
   nodes/detect_parking
   nodes/detect_parking_sign
   nodes/detect_traffic_light
-  nodes/detect_tunnel
-  nodes/detect_tunnel_sign
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
