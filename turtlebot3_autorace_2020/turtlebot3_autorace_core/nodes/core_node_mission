@@ -91,27 +91,39 @@ class ControlMission():
         traffic_parking_model = open(traffic_parking_path, 'r')
         self.traffic_parking_model = traffic_parking_model.read()
 
+        traffic_right_path = model_dir_path + '/traffic_right/model.sdf'
+        traffic_right_model = open(traffic_right_path, 'r')
+        self.traffic_right_model = traffic_right_model.read()
+
+
         parking_model = open(turtlebot_dir_path, 'r')
         self.parking_model = parking_model.read().replace('<static>0', '<static>1')
 
     def setTraffic(self):
         rospy.wait_for_service('gazebo/spawn_sdf_model')
         spawn_model_prox = rospy.ServiceProxy('gazebo/spawn_sdf_model', SpawnModel)
+        # spawn_model_prox(
+        #     'traffic_left',
+        #     self.traffic_left_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
+        # spawn_model_prox(
+        #     'traffic_stop',
+        #     self.traffic_stop_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
+        # spawn_model_prox(
+        #     'traffic_parking',
+        #     self.traffic_parking_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
+        
         spawn_model_prox(
-            'traffic_left',
-            self.traffic_left_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
-        spawn_model_prox(
-            'traffic_stop',
-            self.traffic_stop_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
-        spawn_model_prox(
-            'traffic_parking',
-            self.traffic_parking_model,
+            'traffic_right',
+            self.traffic_right_model,
             "robotos_name_space",
             self.initial_pose,
             "world")
