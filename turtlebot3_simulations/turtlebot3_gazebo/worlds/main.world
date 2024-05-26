@@ -186,28 +186,28 @@
       </spot>
     </light>
     <state world_name='default'>
-      <sim_time>2621 925000000</sim_time>
-      <real_time>192 452226971</real_time>
-      <wall_time>1716705927 65480373</wall_time>
-      <iterations>191550</iterations>
+      <sim_time>2783 870000000</sim_time>
+      <real_time>164 976012874</real_time>
+      <wall_time>1716740203 526569450</wall_time>
+      <iterations>161945</iterations>
       <model name='autorace'>
-        <pose>-1.86755 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
+        <pose>-1.86764 1.58225 -0.001061 -2e-06 -0.00464 0.003875</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose>-1.86755 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
-          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.5e-05 2e-06</velocity>
-          <acceleration>-0 -0 -0 0 -0 0</acceleration>
-          <wrench>-0 -0 -0 0 -0 0</wrench>
+          <pose>-1.86764 1.58225 -0.001061 -2e-06 -0.00464 0.003875</pose>
+          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.3e-05 2e-06</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose>-1.86801 1.66225 0.031938 -1.5707 -0.364267 0.003841</pose>
-          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.7e-05 0</velocity>
-          <acceleration>-0 -0 -0 0 -0 0</acceleration>
-          <wrench>-0 -0 -0 0 -0 0</wrench>
+          <pose>-1.8681 1.66225 0.031938 -1.5707 -0.367083 0.003839</pose>
+          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.6e-05 -0</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose>-1.86739 1.50225 0.031938 -1.5707 -0.34492 0.003843</pose>
-          <velocity>-2.8e-05 0 7e-05 -1.5e-05 -7.4e-05 -1e-06</velocity>
+          <pose>-1.86748 1.50225 0.031938 -1.5707 -0.347731 0.003841</pose>
+          <velocity>-2.8e-05 0 7e-05 -1.5e-05 -7.3e-05 -1e-06</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
@@ -232,31 +232,31 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <model name='traffic_left'>
-        <pose>0.022975 0.027574 0.051324 0 -0 0</pose>
+      <model name='traffic_circle'>
+        <pose>0.78428 0.029268 -0.065869 0 -0 -1.57692</pose>
         <scale>1 1 1</scale>
         <link name='box'>
-          <pose>-1.18702 -1.06243 0.051324 0 -0 0</pose>
+          <pose>0.049674 -1.04625 0.059131 0 -0 3.13626</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='traffic_left'>
+        <pose>0.034698 -0.288835 0.051324 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='box'>
+          <pose>-1.1753 -1.37884 0.051324 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='traffic_parking'>
-        <pose>-0.094309 0.021139 0.058326 0 -0 0</pose>
+        <pose>-0.094309 0.02114 0.058326 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='box'>
           <pose>-0.234309 -1.61886 0.058326 0 -0 1.57</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='traffic_circle'>
-        <pose>0.784276 0.029269 -0.065869 0 0 -1.57692</pose>
-        <scale>1 1 1</scale>
-        <link name='box'>
-          <pose>0.049674 -1.04625 0.059131 0 -0 3.13626</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -273,17 +273,20 @@
         </link>
       </model>
       <model name='unit_box'>
-        <pose>-0.998551 -0.107632 0.114368 -3e-06 4e-06 -5e-06</pose>
+        <pose>-0.998552 -0.107632 0.114369 -1e-06 -3e-06 2e-06</pose>
         <scale>0.238301 0.144323 0.228737</scale>
         <link name='link'>
-          <pose>-0.998551 -0.107632 0.114368 -3e-06 4e-06 -5e-06</pose>
+          <pose>-0.998552 -0.107632 0.114369 -1e-06 -3e-06 2e-06</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.584412 0.353936 -2.09135 -3.09469 -1.1733 0</acceleration>
-          <wrench>0.584412 0.353936 -2.09135 0 -0 0</wrench>
+          <acceleration>0.903366 -0.547109 2.11585 1.64213 1.52608 3.14159</acceleration>
+          <wrench>0.903366 -0.547109 2.11585 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
         <pose>0 0 10 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_0'>
+        <pose>-22.0169 0.431187 1 0 -0 0</pose>
       </light>
       <light name='user_point_light_1'>
         <pose>-1.64815 0.604519 1 0 -0 0</pose>
@@ -294,10 +297,19 @@
       <light name='user_point_light_3'>
         <pose>0.42 -3.31 1 0 -0 0</pose>
       </light>
+      <light name='user_point_light_4'>
+        <pose>-6.90658 1.43848 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_5'>
+        <pose>-2.98397 1.75696 1 0 -0 0</pose>
+      </light>
+      <light name='user_spot_light_0'>
+        <pose>-1.76686 1.34263 1 0 -0 0</pose>
+      </light>
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>0.653856 -0.395096 9.82972 3.14159 1.57079 3.14159</pose>
+        <pose>-0.773357 -0.195348 4.50994 3.14159 1.57079 3.14159</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -415,7 +427,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/u2010202/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/bases/burger_base.stl</uri>
+              <uri>/home/mekhribonu/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/bases/burger_base.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -430,7 +442,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/u2010202/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/sensors/lds.stl</uri>
+              <uri>/home/mekhribonu/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/sensors/lds.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -594,7 +606,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/u2010202/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/wheels/left_tire.stl</uri>
+              <uri>/home/mekhribonu/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/wheels/left_tire.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -674,7 +686,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/u2010202/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/wheels/right_tire.stl</uri>
+              <uri>/home/mekhribonu/catkin_ws/src/turtlebot3/turtlebot3_description/meshes/wheels/right_tire.stl</uri>
             </mesh>
           </geometry>
           <material>
@@ -970,5 +982,62 @@
       </link>
       <pose>0 0 0 0 -0 0</pose>
     </model>
+    <light name='user_point_light_0' type='point'>
+      <pose>-22.0169 0.431187 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_4' type='point'>
+      <pose>-6.90658 1.43848 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_spot_light_0' type='spot'>
+      <pose>-1.76686 1.34263 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>0 0 -1</direction>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <spot>
+        <inner_angle>0.6</inner_angle>
+        <outer_angle>1</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+    </light>
+    <light name='user_point_light_5' type='point'>
+      <pose>-2.98397 1.75696 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
   </world>
 </sdf>

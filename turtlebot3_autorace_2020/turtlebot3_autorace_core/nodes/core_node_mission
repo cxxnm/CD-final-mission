@@ -117,12 +117,12 @@ class ControlMission():
         #     self.initial_pose,
         #     "world")
         
-        spawn_model_prox(
-            'traffic_circle',
-            self.traffic_circle_model,
-            "robotos_name_space",
-            self.initial_pose,
-            "world")
+        # spawn_model_prox(
+        #     'traffic_circle',
+        #     self.traffic_circle_model,
+        #     "robotos_name_space",
+        #     self.initial_pose,
+        #     "world")
 
         parking_pose = Pose()
         parking_stop = np.random.rand()
