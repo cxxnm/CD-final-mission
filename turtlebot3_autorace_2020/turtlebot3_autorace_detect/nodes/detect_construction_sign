@@ -26,7 +26,7 @@ import cv2
 from enum import Enum
 from std_msgs.msg import UInt8
 from sensor_msgs.msg import Image, CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 
 class DetectSign():
     def __init__(self):
