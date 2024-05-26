@@ -66,7 +66,7 @@ class DetectSign():
         dir_path += 'image/'
 
         self.img_left = cv2.imread(dir_path + 'left.png', 0)
-        self.img_circle = cv2.imread('/mnt/data/circle.png', 0)
+        self.img_circle = cv2.imread(dir_path + 'circle.png', 0)
 
         self.kp_left, self.des_left = self.sift.detectAndCompute(self.img_left, None)
         self.kp_circle, self.des_circle = self.sift.detectAndCompute(self.img_circle, None)
