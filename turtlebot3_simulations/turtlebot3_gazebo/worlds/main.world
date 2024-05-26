@@ -186,30 +186,30 @@
       </spot>
     </light>
     <state world_name='default'>
-      <sim_time>2430 375000000</sim_time>
-      <real_time>881 799788404</real_time>
-      <wall_time>1716702244 399546158</wall_time>
-      <iterations>871598</iterations>
+      <sim_time>2621 925000000</sim_time>
+      <real_time>192 452226971</real_time>
+      <wall_time>1716705927 65480373</wall_time>
+      <iterations>191550</iterations>
       <model name='autorace'>
-        <pose>-1.86743 1.58225 -0.001061 -2e-06 -0.00464 0.003921</pose>
+        <pose>-1.86755 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose>-1.86743 1.58225 -0.001061 -2e-06 -0.00464 0.003921</pose>
-          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.7e-05 2e-06</velocity>
+          <pose>-1.86755 1.58225 -0.001061 -2e-06 -0.00464 0.003877</pose>
+          <velocity>-2.6e-05 0 6.9e-05 -1e-05 -5.5e-05 2e-06</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose>-1.8679 1.66225 0.031938 -1.5707 -0.360965 0.003886</pose>
-          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.9e-05 -0</velocity>
+          <pose>-1.86801 1.66225 0.031938 -1.5707 -0.364267 0.003841</pose>
+          <velocity>-2.8e-05 0 6.8e-05 -1.5e-05 -6.7e-05 0</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose>-1.86728 1.50225 0.031938 -1.5707 -0.341621 0.003888</pose>
-          <velocity>-2.7e-05 0 7e-05 -1.5e-05 -7.6e-05 -1e-06</velocity>
-          <acceleration>-0 0 -0 0 -0 0</acceleration>
-          <wrench>-0 0 -0 0 -0 0</wrench>
+          <pose>-1.86739 1.50225 0.031938 -1.5707 -0.34492 0.003843</pose>
+          <velocity>-2.8e-05 0 7e-05 -1.5e-05 -7.4e-05 -1e-06</velocity>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
       </model>
       <model name='course'>
@@ -233,43 +233,53 @@
         </link>
       </model>
       <model name='traffic_left'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0.022975 0.027574 0.051324 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='box'>
-          <pose>-1.21 -1.09 0 0 -0 0</pose>
+          <pose>-1.18702 -1.06243 0.051324 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='traffic_parking'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>-0.094309 0.021139 0.058326 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='box'>
-          <pose>-0.14 -1.64 0 0 -0 1.57</pose>
+          <pose>-0.234309 -1.61886 0.058326 0 -0 1.57</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='traffic_right'>
+        <pose>0.784276 0.029269 -0.065869 0 0 -1.57692</pose>
+        <scale>1 1 1</scale>
+        <link name='box'>
+          <pose>0.049674 -1.04625 0.059131 0 -0 3.13626</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='traffic_stop'>
-        <pose>-0 0 0 0 -0 0</pose>
+        <pose>-0 0 0.060665 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='box'>
-          <pose>-0.33 0.92 0 0 0 -1.58</pose>
+          <pose>-0.33 0.92 0.060665 0 0 -1.58</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='unit_box'>
-        <pose>-0.998551 -0.107632 0.114368 2e-06 4e-06 -2.2e-05</pose>
+        <pose>-0.998551 -0.107632 0.114368 -3e-06 4e-06 -5e-06</pose>
         <scale>0.238301 0.144323 0.228737</scale>
         <link name='link'>
-          <pose>-0.998551 -0.107632 0.114368 2e-06 4e-06 -2.2e-05</pose>
+          <pose>-0.998551 -0.107632 0.114368 -3e-06 4e-06 -5e-06</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.582546 -0.352827 -2.11583 3.08499 -1.18961 0</acceleration>
-          <wrench>0.582546 -0.352827 -2.11583 0 -0 0</wrench>
+          <acceleration>0.584412 0.353936 -2.09135 -3.09469 -1.1733 0</acceleration>
+          <wrench>0.584412 0.353936 -2.09135 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -287,7 +297,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>0.038668 -0.530202 5.60411 3.14159 1.57079 3.14159</pose>
+        <pose>0.653856 -0.395096 9.82972 3.14159 1.57079 3.14159</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -749,7 +759,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.999997 0.999998 1</size>
+              <size>0.999996 1 1</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -769,7 +779,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.999997 0.999998 1</size>
+              <size>0.999996 1 1</size>
             </box>
           </geometry>
           <material>
@@ -907,6 +917,50 @@
               <uri>model://turtlebot3_autorace_2020/traffic_parking/materials/scripts</uri>
               <uri>model://turtlebot3_autorace_2020/traffic_parking/materials/textures</uri>
               <name>traffic_parking</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0 0 0 0 -0 0</pose>
+    </model>
+    <model name='traffic_right'>
+      <static>1</static>
+      <link name='box'>
+        <pose>1.08 -0.728 0.125 0 -0 -1.57</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.12 0.025 0.25</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.12 0.025 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://turtlebot3_autorace_2020/traffic_right/materials/scripts</uri>
+              <uri>model://turtlebot3_autorace_2020/traffic_right/materials/textures</uri>
+              <name>traffic_right</name>
             </script>
           </material>
         </visual>
