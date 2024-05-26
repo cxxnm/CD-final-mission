@@ -46,8 +46,6 @@ catkin_install_python(PROGRAMS
   nodes/parking_core_node_controller
   nodes/traffic_light_core_mode_decider
   nodes/traffic_light_core_node_controller
-  nodes/tunnel_core_mode_decider
-  nodes/tunnel_core_node_controller
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
