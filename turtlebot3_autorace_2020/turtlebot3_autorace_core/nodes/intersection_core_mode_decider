@@ -78,7 +78,7 @@ class CoreModeDecider:
             ):  # Any Sign detected
                 rospy.loginfo("Any Sign detected")
                 if (
-                    msg_data.data == self.TrafficSign.intersection.value
+                    msg_data.data == self.TrafficSign.circle.value
                 ):  # intersection sign deteced
                     self.current_mode = self.CurrentMode.intersection.value
                     rospy.loginfo("detect sign : intersection")
