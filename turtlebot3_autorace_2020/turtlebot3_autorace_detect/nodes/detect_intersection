@@ -77,11 +77,6 @@ class DetectIntersection:
         msg_pub_intersection_return = UInt8()
 
         if order.data == self.StepOfIntersection.detect_direction.value:
-            self.is_circle_detected = True
-            while True:
-                if self.is_left_detected == True:
-                    break
-
             if self.is_left_detected == True:
                 rospy.loginfo("go straight")
                 msg_moving = MovingParam()
@@ -109,6 +104,7 @@ class DetectIntersection:
 
                 rospy.sleep(1)
 
+            if self.is_circle_detected == True:
                 rospy.loginfo("go straight")
                 msg_moving = MovingParam()
                 msg_moving.moving_type = 4
