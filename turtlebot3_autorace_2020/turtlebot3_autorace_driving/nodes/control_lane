@@ -65,6 +65,11 @@ class ControlLane():
 
     def loadMissionModel(self):
         model_dir_path = os.path.dirname(os.path.realpath(__file__))
+        print("--------")
+        print("--------")
+        print(model_dir_path)
+        print("--------")
+        print("--------")
         model_dir_path = model_dir_path.replace(
             '/turtlebot3_autorace_2020/turtlebot3_autorace_driving/nodes',
             '/turtlebot3_simulations/turtlebot3_gazebo/models/turtlebot3_autorace_2020')
