@@ -252,7 +252,7 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <model name='traffic_right'>
+      <model name='traffic_circle'>
         <pose>0.784276 0.029269 -0.065869 0 0 -1.57692</pose>
         <scale>1 1 1</scale>
         <link name='box'>
@@ -926,7 +926,7 @@
       </link>
       <pose>0 0 0 0 -0 0</pose>
     </model>
-    <model name='traffic_right'>
+    <model name='traffic_circle'>
       <static>1</static>
       <link name='box'>
         <pose>1.08 -0.728 0.125 0 -0 -1.57</pose>
@@ -958,9 +958,9 @@
           </geometry>
           <material>
             <script>
-              <uri>model://turtlebot3_autorace_2020/traffic_right/materials/scripts</uri>
-              <uri>model://turtlebot3_autorace_2020/traffic_right/materials/textures</uri>
-              <name>traffic_right</name>
+              <uri>model://turtlebot3_autorace_2020/traffic_circle/materials/scripts</uri>
+              <uri>model://turtlebot3_autorace_2020/traffic_circle/materials/textures</uri>
+              <name>traffic_circle</name>
             </script>
           </material>
         </visual>

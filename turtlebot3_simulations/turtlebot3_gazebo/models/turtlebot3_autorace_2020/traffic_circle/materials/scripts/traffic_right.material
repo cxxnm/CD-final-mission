@@ -1,4 +1,4 @@
-material traffic_right
+material traffic_circle
 {
   technique
   {
@@ -6,7 +6,7 @@ material traffic_right
     {
       texture_unit
       {
-        texture traffic_right.png
+        texture traffic_circle.png
       }
     }
   }
