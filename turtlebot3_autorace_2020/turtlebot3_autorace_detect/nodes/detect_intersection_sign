@@ -160,7 +160,7 @@ class DetectSign:
 
         good_circle = []
         for m, n in matches_circle:
-            if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
+            if m.distance < 0.7 * n.distance:  # lowered from 0.7 to 0.6
                 good_circle.append(m)
         if len(good_circle) > MIN_MATCH_COUNT:
             src_pts = np.float32(

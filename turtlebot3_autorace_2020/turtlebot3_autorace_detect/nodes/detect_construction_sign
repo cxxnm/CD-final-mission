@@ -130,7 +130,7 @@ class DetectSign():
 
         good_construction = []
         for m,n in matches_construction:
-            if m.distance < 0.7*n.distance:
+            if m.distance < 0.9 * n.distance:
                 good_construction.append(m)
 
         if len(good_construction)>MIN_MATCH_COUNT:
@@ -151,7 +151,6 @@ class DetectSign():
                 image_out_num = 2
         else:
             matches_construction = None
-            rospy.loginfo("not found")
       
         if image_out_num == 1:
             if self.pub_image_type == "compressed":

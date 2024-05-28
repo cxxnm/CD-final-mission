@@ -160,7 +160,7 @@ class DetectSign:
 
         good_parking = []
         for m, n in matches_parking:
-            if m.distance < 0.7 * n.distance:
+            if m.distance < 0.9 * n.distance:
                 good_parking.append(m)
 
         if len(good_parking) >= MIN_MATCH_COUNT:
