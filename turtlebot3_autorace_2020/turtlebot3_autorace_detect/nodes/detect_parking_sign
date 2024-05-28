@@ -149,8 +149,8 @@ class DetectSign:
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 4  # Lowered the match count threshold
-        MIN_MSE_DECISION = 70000  # Increased the MSE threshold
+        MIN_MATCH_COUNT = 6  # Lowered the match count threshold
+        MIN_MSE_DECISION = 50000  # Increased the MSE threshold
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
@@ -160,7 +160,7 @@ class DetectSign:
 
         good_parking = []
         for m, n in matches_parking:
-            if m.distance < 0.4 * n.distance:
+            if m.distance < 0.6 * n.distance:
                 good_parking.append(m)
 
         if len(good_parking) >= MIN_MATCH_COUNT:
