@@ -39,19 +39,20 @@ class CoreNodeController():
         self.pub_intersection_order = rospy.Publisher('/detect/intersection_order', UInt8, queue_size=1)
         self.pub_mode_return = rospy.Publisher('/core/returned_mode', UInt8, queue_size=1)
         
-        self.CurrentMode = Enum('CurrentMode', 'idle lane_following intersection')
+        self.CurrentMode = Enum('CurrentMode', 'idle lane_following intersection parking')
         self.current_mode = self.CurrentMode.idle.value
         
         self.StepOfIntersection = Enum('StepOfIntersection', 'detect_direction exit')
         self.current_step_intersection = self.StepOfIntersection.detect_direction.value
         
-        self.Launcher = Enum('Launcher', 'launch_camera_ex_calib launch_detect_sign launch_detect_lane launch_detect_intersection launch_control_lane launch_control_moving')
+        self.Launcher = Enum('Launcher', 'launch_camera_ex_calib launch_detect_sign launch_detect_lane launch_detect_intersection launch_detect_parking launch_control_lane launch_control_moving')
         self.uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         self.launch_camera_launched = False
         self.launch_detect_sign_launched = False
         self.launch_detect_lane_launched = False    
         self.launch_detect_intersection_launched = False
+        self.launch_detect_parking_launched = False
         self.launch_control_lane_launched = False
         self.launch_control_moving_launched = False
 
@@ -124,6 +125,40 @@ class CoreNodeController():
                
                 self.fnLaunch(self.Launcher.launch_control_lane.value, True)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+        
+        # parking
+        elif self.current_mode == self.CurrentMode.parking.value:
+            rospy.loginfo("New trigger for parking")
+            msg_pub_parking_order = UInt8()
+
+            if self.current_step_parking == self.StepOfParking.parking.value:
+                rospy.loginfo("Current step : parking")
+                rospy.loginfo("Go to next step : finish parking")
+
+                msg_pub_parking_order.data = self.StepOfParking.parking.value
+
+                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
+
+                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+                self.fnLaunch(self.Launcher.launch_detect_sign.value, False)
+                self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
+
+                self.fnLaunch(self.Launcher.launch_control_lane.value, False)
+                self.fnLaunch(self.Launcher.launch_control_moving.value, True)
+                                   
+            elif self.current_step_parking == self.StepOfParking.exit.value:
+                rospy.loginfo("Current step : finish parking")
+
+                msg_pub_parking_order.data = self.StepOfParking.exit.value
+
+                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
+
+                self.fnLaunch(self.Launcher.launch_detect_sign.value, True)
+                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+                self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
+
+                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
+                self.fnLaunch(self.Launcher.launch_control_moving.value, False)
 
             rospy.sleep(3)
             self.pub_intersection_order.publish(msg_pub_intersection_order)
@@ -189,6 +224,22 @@ class CoreNodeController():
                     self.launch_detect_intersection_launched = False
                     self.launch_detect_intersection.shutdown()
                 pass
+
+        elif launch_num == self.Launcher.launch_detect_parking.value:
+            if is_start == True:
+                if self.launch_detect_parking_launched == False:
+                    self.launch_detect_parking = roslaunch.scriptapi.ROSLaunch()
+                    self.launch_detect_parking = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_parking.launch"])
+                    self.launch_detect_parking_launched = True
+                    self.launch_detect_parking.start()
+                else:
+                    pass
+            else:
+                if self.launch_detect_parking_launched == True:
+                    self.launch_detect_parking_launched = False
+                    self.launch_detect_parking.shutdown()
+                else:
+                    pass                  
 
         elif launch_num == self.Launcher.launch_control_lane.value:
             if is_start == True:
