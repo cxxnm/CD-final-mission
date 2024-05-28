@@ -84,34 +84,28 @@ class CoreModeDecider:
 
     def fnDecideMode(
         self, invoked_object, msg_data
-    ):  # starts only when the traffic sign / traffic light is detected & current_mode is lane_following
-        if self.current_mode == self.CurrentMode.lane_following.value:
+    ):
+        if invoked_object == self.InvokedObject.traffic_sign.value:
+            rospy.loginfo("Any Sign detected")
             if (
-                invoked_object == self.InvokedObject.traffic_sign.value
-            ):  # Any Sign detected
-                rospy.loginfo("Any Sign detected")
-                if (
-                    msg_data.data == self.TrafficSign.circle.value or msg_data.data == self.TrafficSign.left.value
-                ):  # intersection sign deteced
-                    self.current_mode = self.CurrentMode.intersection.value
-                    rospy.loginfo("detect sign : intersection")
-                if (
-                    msg_data.data == self.TrafficSign.parking.value
-                ):  # parking sign deteced
-                    self.current_mode = self.CurrentMode.parking.value
-                    rospy.loginfo("detect sign : parking")
-                if (
-                    msg_data.data == self.TrafficSign.construction.value
-                ):  # construction sign deteced
-                    self.current_mode = self.CurrentMode.construction.value
-                    rospy.loginfo("detect sign : construction")
-
-            else:
-                pass
-            self.fnPublishMode()
-
+                msg_data.data == self.TrafficSign.circle.value or msg_data.data == self.TrafficSign.left.value
+            ):  # intersection sign deteced
+                self.current_mode = self.CurrentMode.intersection.value
+                rospy.loginfo("detect sign : intersection")
+            if (
+                msg_data.data == self.TrafficSign.parking.value
+            ):  # parking sign deteced
+                self.current_mode = self.CurrentMode.parking.value
+                rospy.loginfo("detect sign : parking")
+            if (
+                msg_data.data == self.TrafficSign.construction.value
+            ):  # construction sign deteced
+                self.current_mode = self.CurrentMode.construction.value
+                rospy.loginfo("detect sign : construction")
         else:
             pass
+
+        self.fnPublishMode()
 
     def fnPublishMode(self):
         decided_mode = UInt8()
