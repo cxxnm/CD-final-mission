@@ -77,7 +77,15 @@ class DetectSign:
             )
 
         self.cvBridge = CvBridge()
-        self.TrafficSign = Enum("TrafficSign", "circle left")
+        self.TrafficSign = Enum(
+            "TrafficSign", 
+            (
+                "circle",
+                "left",
+                "parking",
+                "construction"
+            )
+        )
         self.counter = 1
 
     def fnPreproc(self):

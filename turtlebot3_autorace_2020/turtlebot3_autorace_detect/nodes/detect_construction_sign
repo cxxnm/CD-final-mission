@@ -54,7 +54,15 @@ class DetectSign():
             self.pub_image_traffic_sign = rospy.Publisher('/detect/image_output', Image, queue_size = 1)
 
         self.cvBridge = CvBridge()
-        self.TrafficSign = Enum('TrafficSign', 'construction')
+        self.TrafficSign = Enum(
+            "TrafficSign", 
+            (
+                "circle",
+                "left",
+                "parking",
+                "construction"
+            )
+        )
         self.counter = 1
 
     def fnPreproc(self):
