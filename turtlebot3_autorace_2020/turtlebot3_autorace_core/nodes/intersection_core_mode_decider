@@ -86,7 +86,7 @@ class CoreModeDecider:
                     msg_data.data == self.TrafficSign.parking.value
                 ):  # intersection sign deteced
                     self.current_mode = self.CurrentMode.parking.value
-                    rospy.loginfo("detect sign : intersection")
+                    rospy.loginfo("detect sign : parking")
             else:
                 pass
             self.fnPublishMode()
