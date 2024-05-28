@@ -62,7 +62,7 @@ class CoreNodeController():
                 'parking'
             )
         )
-        self.current_mode = self.CurrentMode.idle.value
+        self.current_mode = self.CurrentMode.lane_following.value
         
         # STEPS
         self.Step = Enum(
