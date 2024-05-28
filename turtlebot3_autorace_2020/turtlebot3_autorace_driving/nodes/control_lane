@@ -59,10 +59,10 @@ class ControlLane:
         # twist.linear.x = 0.05
         try:
             twist.linear.x = min(
-                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.2), 0.02
+                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.2), 0.04
             )
         except:
-            twist.linear.x = 0.05
+            twist.linear.x = 0.04
         twist.linear.y = 0
         twist.linear.z = 0
         twist.angular.x = 0
