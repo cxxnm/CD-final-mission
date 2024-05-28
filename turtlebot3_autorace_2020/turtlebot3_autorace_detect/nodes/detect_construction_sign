@@ -118,9 +118,8 @@ class DetectSign():
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 8
+        MIN_MATCH_COUNT = 8 #9
         MIN_MSE_DECISION = 50000
-        ratio_test_threshold = 0.85
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input,None)
@@ -130,8 +129,8 @@ class DetectSign():
         image_out_num = 1
 
         good_construction = []
-        for m, n in matches_construction:
-            if m.distance < ratio_test_threshold * n.distance:
+        for m,n in matches_construction:
+            if m.distance < 0.7*n.distance:
                 good_construction.append(m)
 
         if len(good_construction)>MIN_MATCH_COUNT:
@@ -148,10 +147,11 @@ class DetectSign():
 
                 self.pub_traffic_sign.publish(msg_sign)
 
-                rospy.loginfo("Construction found")
+                rospy.loginfo("construction")
                 image_out_num = 2
         else:
             matches_construction = None
+            rospy.loginfo("not found")
       
         if image_out_num == 1:
             if self.pub_image_type == "compressed":
