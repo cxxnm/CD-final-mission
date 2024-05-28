@@ -53,14 +53,31 @@ class CoreNodeController():
         self.current_step_intersection = self.Step.circling.value
         self.current_step_parking = self.Step.circling.value
         
-        self.Launcher = Enum('Launcher', 'launch_camera_ex_calib launch_detect_sign launch_detect_lane launch_detect_intersection launch_detect_parking launch_control_lane launch_control_moving')
+        self.Launcher = Enum(
+            'Launcher',
+            (
+                'launch_camera_ex_calib '
+                'launch_detect_intersection '
+                'launch_detect_intersection_sign ' 
+                'launch_detect_parking '
+                'launch_detect_parking_sign '
+                'launch_detect_lane '
+                'launch_control_lane '
+                'launch_control_moving'
+            )
+            
+            )
         self.uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         self.launch_camera_launched = False
-        self.launch_detect_sign_launched = False
-        self.launch_detect_lane_launched = False    
+        self.launch_detect_lane_launched = False
+ 
         self.launch_detect_intersection_launched = False
+        self.launch_detect_intersection_sign_launched = False
+
         self.launch_detect_parking_launched = False
+        self.launch_detect_parking_sign_launched = False
+
         self.launch_control_lane_launched = False
         self.launch_control_moving_launched = False
 
@@ -200,21 +217,36 @@ class CoreNodeController():
                     self.launch_camera.shutdown()
                 else:
                     pass
-        elif launch_num == self.Launcher.launch_detect_sign.value:
+        elif launch_num == self.Launcher.launch_detect_intersection_sign.value:
             if is_start == True:
-                if self.launch_detect_sign_launched == False:
+                if self.launch_detect_intersection_sign_launched == False:
                     self.launch_detect_sign = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_sign.launch"])
-                    self.launch_detect_sign_launched = True
+                    self.launch_detect_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_intersection_sign.launch"])
+                    self.launch_detect_intersection_sign_launched = True
                     self.launch_detect_sign.start()
                 else:
                     pass
             else:
-                if self.launch_detect_sign_launched == True:
-                    self.launch_detect_sign_launched = False
+                if self.launch_detect_intersection_sign_launched == True:
+                    self.launch_detect_intersection_sign_launched = False
                     self.launch_detect_sign.shutdown()
                 else:
-                    pass                
+                    pass
+        elif launch_num == self.Launcher.launch_detect_parking_sign.value:
+            if is_start == True:
+                if self.launch_detect_parking_sign_launched == False:
+                    self.launch_detect_sign = roslaunch.scriptapi.ROSLaunch()
+                    self.launch_detect_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_parking_sign.launch"])
+                    self.launch_detect_parking_sign_launched = True
+                    self.launch_detect_sign.start()
+                else:
+                    pass
+            else:
+                if self.launch_detect_parking_sign_launched == True:
+                    self.launch_detect_parking_sign_launched = False
+                    self.launch_detect_sign.shutdown()
+                else:
+                    pass             
         elif launch_num == self.Launcher.launch_detect_lane.value:
             if is_start == True:
                 if self.launch_detect_lane_launched == False:
