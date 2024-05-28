@@ -123,9 +123,10 @@ class CoreNodeController():
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
 
             self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_sign.value, True)
             self.fnLaunch(self.Launcher.launch_detect_intersection.value, False)
+            self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
             self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
+            self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
 
             self.fnLaunch(self.Launcher.launch_control_lane.value, True)
             self.fnLaunch(self.Launcher.launch_control_moving.value, False)
