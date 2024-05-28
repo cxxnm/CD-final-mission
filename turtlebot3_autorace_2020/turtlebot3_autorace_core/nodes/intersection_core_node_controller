@@ -1,4 +1,5 @@
-import rospy, roslaunch
+import rospy
+import roslaunch
 import os
 from enum import Enum
 from std_msgs.msg import UInt8, Float64
@@ -30,7 +31,7 @@ class CoreNodeController():
         self.current_step_parking = self.Step.parking.value
 
         self.Launcher = Enum('Launcher', [
-            'launch_extrinsic_camera_calibration',
+            'launch_camera_ex_calib',
             'launch_detect_construction',
             'launch_detect_construction_sign',
             'launch_detect_intersection',
@@ -42,7 +43,21 @@ class CoreNodeController():
             'launch_control_moving'
         ])
 
+        self.launch_files = {
+            'launch_camera_ex_calib': 'turtlebot3_autorace_camera/launch/extrinsic_camera_calibration.launch',
+            'launch_detect_construction': 'turtlebot3_autorace_detect/launch/detect_construction.launch',
+            'launch_detect_construction_sign': 'turtlebot3_autorace_detect/launch/detect_construction_sign.launch',
+            'launch_detect_intersection': 'turtlebot3_autorace_detect/launch/detect_intersection.launch',
+            'launch_detect_intersection_sign': 'turtlebot3_autorace_detect/launch/detect_intersection_sign.launch',
+            'launch_detect_parking': 'turtlebot3_autorace_detect/launch/detect_parking.launch',
+            'launch_detect_parking_sign': 'turtlebot3_autorace_detect/launch/detect_parking_sign.launch',
+            'launch_detect_lane': 'turtlebot3_autorace_detect/launch/detect_lane.launch',
+            'launch_control_lane': 'turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_lane.launch',
+            'launch_control_moving': 'turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_moving.launch'
+        }
+
         self.uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch.configure_logging(self.uuid)
         self.processes = {}
         self.is_triggered = False
         self.is_started = True
@@ -133,38 +148,38 @@ class CoreNodeController():
         self.pub_construction_order.publish(msg_pub_construction_order)
 
     def launch_all_nodes(self):
-        self.fnLaunch(self.Launcher.launch_extrinsic_camera_calibration.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_intersection.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
-        self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
-        self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-        self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+        self.fnLaunch(self.Launcher.launch_camera_ex_calib.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_lane.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_intersection_sign.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_intersection.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_construction_sign.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_construction.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_parking_sign.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_parking.name, True)
+        self.fnLaunch(self.Launcher.launch_control_lane.name, True)
+        self.fnLaunch(self.Launcher.launch_control_moving.name, False)
 
     def launch_all_nodes_except(self, exclude_list):
         for launcher in self.Launcher:
             if launcher.name not in exclude_list:
-                self.fnLaunch(launcher.value, True)
+                self.fnLaunch(launcher.name, True)
 
-    def fnLaunch(self, launch_num, is_start):
-        node_name = self.Launcher(launch_num).name
+    def fnLaunch(self, node_name, is_start):
+        launch_file = self.launch_files[node_name]
 
         if is_start:
-            if launch_num in self.processes and self.processes[launch_num] is not None:
+            if node_name in self.processes and self.processes[node_name] is not None:
                 rospy.loginfo(f"{node_name} is already launched.")
             else:
                 rospy.loginfo(f"Starting {node_name}")
-                parent = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
-                self.processes[launch_num] = parent
+                parent = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + launch_file])
+                self.processes[node_name] = parent
                 parent.start()
         else:
-            if launch_num in self.processes and self.processes[launch_num] is not None:
+            if node_name in self.processes and self.processes[node_name] is not None:
                 rospy.loginfo(f"Stopping {node_name}")
-                self.processes[launch_num].shutdown()
-                self.processes[launch_num] = None
+                self.processes[node_name].shutdown()
+                self.processes[node_name] = None
 
     def main(self):
         rospy.spin()
