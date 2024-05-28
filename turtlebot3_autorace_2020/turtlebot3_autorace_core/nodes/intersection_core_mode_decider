@@ -92,12 +92,12 @@ class CoreModeDecider:
             ):  # intersection sign deteced
                 self.current_mode = self.CurrentMode.intersection.value
                 rospy.loginfo("detect sign : intersection")
-            if (
+            elif (
                 msg_data.data == self.TrafficSign.parking.value
             ):  # parking sign deteced
                 self.current_mode = self.CurrentMode.parking.value
                 rospy.loginfo("detect sign : parking")
-            if (
+            elif (
                 msg_data.data == self.TrafficSign.construction.value
             ):  # construction sign deteced
                 self.current_mode = self.CurrentMode.construction.value

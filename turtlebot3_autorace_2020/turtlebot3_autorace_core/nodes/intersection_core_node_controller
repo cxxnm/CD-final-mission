@@ -117,10 +117,10 @@ class CoreNodeController():
         self.is_started = True
 
         loop_rate = rospy.Rate(10) # 10hz
+
         while not rospy.is_shutdown():
 
             if self.is_started == True:
-                self.current_mode = self.CurrentMode.lane_following.value
                 self.fnControlNode()
                 self.is_started = False
 
@@ -173,7 +173,6 @@ class CoreNodeController():
 
     def fnControlNode(self): 
         # start 
-
         rospy.loginfo(f"MODE: {self.current_mode}")
         # lane_following
         if self.current_mode == self.CurrentMode.lane_following.value:
