@@ -83,7 +83,7 @@ class DetectIntersection:
 
     def cbIntersectionOrder(self, order):
         msg_pub_intersection_return = UInt8()
-        rospy.loginfo("INTERSECTION ORDER")
+        rospy.loginfo("[o]: INTERSECTION ORDER")
         if order.data == self.StepOfIntersection.circling.value:
             if self.is_left_detected == True:
                 rospy.loginfo("go straight")

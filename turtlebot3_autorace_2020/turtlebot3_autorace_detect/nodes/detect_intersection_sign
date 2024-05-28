@@ -170,7 +170,7 @@ class DetectSign:
                 msg_sign.data = self.TrafficSign.circle.value
 
                 self.pub_traffic_sign.publish(msg_sign)
-                rospy.loginfo("detect circle sign")
+                rospy.loginfo("Circle sign DETECTED!")
                 image_out_num = 2
 
         else:

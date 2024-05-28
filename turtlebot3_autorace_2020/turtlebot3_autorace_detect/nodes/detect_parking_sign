@@ -149,8 +149,6 @@ class DetectSign:
             if m.distance < 0.7 * n.distance:
                 good_parking.append(m)
 
-        rospy.loginfo(f"Number of good matches: {len(good_parking)}")
-
         if len(good_parking) >= MIN_MATCH_COUNT:
             src_pts = np.float32(
                 [kp1[m.queryIdx].pt for m in good_parking]
@@ -163,19 +161,18 @@ class DetectSign:
             matchesMask_parking = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)
-            rospy.loginfo(f"MSE: {mse}")
+
             if mse < MIN_MSE_DECISION:
                 msg_sign = UInt8()
                 msg_sign.data = self.TrafficSign.parking.value
 
                 self.pub_traffic_sign.publish(msg_sign)
 
-                rospy.loginfo("parking")
+                rospy.loginfo("Parkin sign DETECTED!")
                 image_out_num = 2
 
         else:
             matchesMask_parking = None
-            rospy.loginfo("nothing")
 
         if image_out_num == 1:
             if self.pub_image_type == "compressed":

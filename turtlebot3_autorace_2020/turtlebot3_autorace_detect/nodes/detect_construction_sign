@@ -133,7 +133,7 @@ class DetectSign():
 
                 self.pub_traffic_sign.publish(msg_sign)
 
-                rospy.loginfo("Construction found")
+                rospy.loginfo("Construction sign DETECTED!")
                 image_out_num = 2
         else:
             matches_construction = None

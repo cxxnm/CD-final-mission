@@ -44,7 +44,7 @@ class DetectParking():
 
     def cbParkingOrder(self, order):
         msg_pub_parking_return = UInt8()
-        rospy.loginfo("PARKING ORDER")
+        rospy.loginfo("[o]: PARKING ORDER")
         if order.data == self.StepOfParking.parking.value:                              
             rospy.loginfo("Now motion")
             msg_pub_max_vel = Float64()
