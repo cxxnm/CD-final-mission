@@ -161,7 +161,6 @@ class CoreNodeController():
                 rospy.loginfo(f"{node_name} is already launched.")
             else:
                 rospy.loginfo(f"Starting {node_name}")
-                launch = roslaunch.scriptapi.ROSLaunch()
                 launch = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
                 self.processes[launch_num] = launch
                 launch.start()
