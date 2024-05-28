@@ -114,9 +114,15 @@ class CoreNodeController():
         self.launch_control_moving_launched = False
 
         self.is_triggered = False
+        self.is_started = True
 
         loop_rate = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
+
+            if self.is_started == True:
+                self.fnControlNode()
+                self.is_started = False
+
             if self.is_triggered == True:
                 self.fnControlNode()
             
@@ -269,6 +275,7 @@ class CoreNodeController():
                 self.fnLaunch(self.Launcher.launch_control_moving.value, False)
             rospy.sleep(2)
             self.pub_construction_order.publish(msg_pub_construction_order)
+
     def fnLaunch(self, launch_num, is_start):
         # NODE: extrinsic_camera
         if launch_num == self.Launcher.launch_camera_ex_calib.value:
