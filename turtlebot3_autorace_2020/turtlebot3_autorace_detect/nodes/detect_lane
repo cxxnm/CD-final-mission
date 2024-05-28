@@ -376,11 +376,13 @@ class DetectLane():
     def make_lane(self, cv_image, yellow_fraction_right, yellow_fraction_left):
         # Create an image to draw the lines on
         warp_zero = np.zeros((cv_image.shape[0], cv_image.shape[1], 1), dtype=np.uint8)
-
         color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
         color_warp_lines = np.dstack((warp_zero, warp_zero, warp_zero))
 
         ploty = np.linspace(0, cv_image.shape[0] - 1, cv_image.shape[0])
+
+        centerx = np.ones(ploty.shape) * (cv_image.shape[1] / 2)  # Default value for centerx
+        self.is_center_x_exist = False
 
         if yellow_fraction_left > 3000:
             pts_left = np.array([np.flipud(np.transpose(np.vstack([self.left_fitx, ploty])))])
@@ -390,48 +392,41 @@ class DetectLane():
             pts_right = np.array([np.transpose(np.vstack([self.right_fitx, ploty]))])
             cv2.polylines(color_warp_lines, np.int_([pts_right]), isClosed=False, color=(255, 255, 0), thickness=25)
         
-        self.is_center_x_exist = True
-
         if self.reliability_yellow_right_line > 50 and self.reliability_yellow_left_line > 50:   
             if yellow_fraction_right > 3000 and yellow_fraction_left > 3000:
                 centerx = np.mean([self.left_fitx, self.right_fitx], axis=0)
                 pts = np.hstack((pts_left, pts_right))
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
-
-                # Draw the lane onto the warped blank image
                 cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
+                self.is_center_x_exist = True
 
             if yellow_fraction_right > 3000 and yellow_fraction_left <= 3000:
                 centerx = np.subtract(self.right_fitx, 320)
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+                self.is_center_x_exist = True
 
             if yellow_fraction_right <= 3000 and yellow_fraction_left > 3000:
                 centerx = np.add(self.left_fitx, 320)
                 pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-
                 cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+                self.is_center_x_exist = True
 
         elif self.reliability_yellow_right_line <= 50 and self.reliability_yellow_left_line > 50:
             centerx = np.add(self.left_fitx, 320)
             pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-
             cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+            self.is_center_x_exist = True
 
         elif self.reliability_yellow_right_line > 50 and self.reliability_yellow_left_line <= 50:
             centerx = np.subtract(self.right_fitx, 320)
             pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
-
             cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
+            self.is_center_x_exist = True
 
         else:
-            
             # Draw a straight center line in the middle of the image
-            self.is_center_x_exist = True
-            centerx = np.ones(ploty.shape) * (cv_image.shape[1] / 2)
             pts_center = np.array([np.transpose(np.vstack([centerx, ploty]))])
             cv2.polylines(color_warp_lines, np.int_([pts_center]), isClosed=False, color=(0, 255, 255), thickness=12)
 
@@ -440,7 +435,7 @@ class DetectLane():
         final = cv2.addWeighted(final, 1, color_warp_lines, 1, 0)
 
         if self.pub_image_type == "compressed":
-            if self.is_center_x_exist == True:
+            if self.is_center_x_exist:
                 # publishes lane center
                 msg_desired_center = Float64()
                 msg_desired_center.data = centerx.item(350)
@@ -449,7 +444,7 @@ class DetectLane():
             self.pub_image_lane.publish(self.cvBridge.cv2_to_compressed_imgmsg(final, "jpg"))
 
         elif self.pub_image_type == "raw":
-            if self.is_center_x_exist == True:
+            if self.is_center_x_exist:
                 # publishes lane center
                 msg_desired_center = Float64()
                 msg_desired_center.data = centerx.item(350)

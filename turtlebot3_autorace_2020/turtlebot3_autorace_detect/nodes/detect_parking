@@ -28,7 +28,6 @@ from turtlebot3_autorace_msgs.msg import MovingParam
 class DetectParking():
     def __init__(self):
         # subscribes state 
-        self.sub_scan_obstacle = rospy.Subscriber('/detect/scan', LaserScan, self.cbScanObstacle, queue_size=1)
         self.sub_parking_order = rospy.Subscriber('/detect/parking_order', UInt8, self.cbParkingOrder, queue_size=1)
         self.sub_moving_completed = rospy.Subscriber('/control/moving/complete', UInt8, self.cbMovingComplete, queue_size = 1)
         
@@ -91,30 +90,6 @@ class DetectParking():
 
         self.pub_parking_return.publish(msg_pub_parking_return)
         rospy.sleep(3)
-
-    def cbScanObstacle(self, scan):
-        angle_scan = 30
-
-        scan_start_left = 90 - angle_scan
-        scan_end_left = 90 + angle_scan
-
-        scan_start_right = 270 - angle_scan
-        scan_end_right = 270 + angle_scan
-
-        threshold_distance = 0.5
-
-        if self.start_obstacle_detection == True:
-            for i in range(scan_start_left, scan_end_left):
-                if scan.ranges[i] < threshold_distance and scan.ranges[i] > 0.01:
-                    self.is_obstacle_detected_L = True
-                    rospy.loginfo("left detected")
-            
-
-            for i in range(scan_start_right, scan_end_right):
-                if scan.ranges[i] < threshold_distance and scan.ranges[i] > 0.01:
-                    self.is_obstacle_detected_R = True
-                    rospy.loginfo("right detected")
-            self.start_obstacle_detection = False
 
     def main(self):
         rospy.spin()
