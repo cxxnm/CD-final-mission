@@ -72,7 +72,6 @@ class DetectParking():
             msg_moving.moving_value_linear = 0.35
             self.pub_moving.publish(msg_moving)
             while not self.is_moving_complete:
-                rospy.loginfo("sleeping")
                 rospy.sleep(0.1)
             self.is_moving_complete = False
 

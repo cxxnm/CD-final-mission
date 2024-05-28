@@ -157,7 +157,7 @@ class CoreNodeController():
         self.fnLaunch(self.Launcher.launch_detect_parking_sign.name, True)
         self.fnLaunch(self.Launcher.launch_detect_parking.name, True)
         self.fnLaunch(self.Launcher.launch_control_lane.name, True)
-        self.fnLaunch(self.Launcher.launch_control_moving.name, False)
+        self.fnLaunch(self.Launcher.launch_control_moving.name, True)
 
     def launch_all_nodes_except(self, exclude_list):
         for launcher in self.Launcher:
