@@ -127,7 +127,7 @@ class DetectSign:
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 5  # Lowered the match count threshold
+        MIN_MATCH_COUNT = 4  # Lowered the match count threshold
         MIN_MSE_DECISION = 70000  # Increased the MSE threshold
 
         # find the keypoints and descriptors with SIFT
