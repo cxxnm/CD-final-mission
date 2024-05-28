@@ -143,7 +143,7 @@ class DetectSign:
 
         rospy.loginfo(f"Number of good matches: {len(good_parking)}")
 
-        if len(good_parking) > MIN_MATCH_COUNT:
+        if len(good_parking) >= MIN_MATCH_COUNT:
             src_pts = np.float32(
                 [kp1[m.queryIdx].pt for m in good_parking]
             ).reshape(-1, 1, 2)
