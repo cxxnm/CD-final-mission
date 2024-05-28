@@ -49,27 +49,27 @@ class ControlLane:
 
         error = center - 500
 
-        Kp = 0.0055
-        Kd = 0.009
+        Kp = 0.007
+        Kd = 0.015
 
         angular_z = Kp * error + Kd * (error - self.lastError)
         self.lastError = error
 
         twist = Twist()
-        # twist.linear.x = 0.05
+        base_speed = 0.1
         try:
             twist.linear.x = min(
-                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.2), 0.04
+                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.5) + base_speed, self.MAX_VEL
             )
         except:
-            twist.linear.x = 0.04
+            twist.linear.x = base_speed
         twist.linear.y = 0
         twist.linear.z = 0
         twist.angular.x = 0
         twist.angular.y = 0
         twist.angular.z = (
-            -max(angular_z, -0.2) if angular_z < 0 else -min(angular_z, 0.2)
-        )
+            -max(angular_z, -0.3) if angular_z < 0 else -min(angular_z, 0.3)
+        )  # Allow larger angular velocities for smoother turns
         self.pub_cmd_vel.publish(twist)
 
     def fnShutDown(self):
@@ -86,6 +86,11 @@ class ControlLane:
 
     def main(self):
         rospy.spin()
+
+if __name__ == '__main__':
+    rospy.init_node('control_lane')
+    node = ControlLane()
+    node.main()
 
 
 if __name__ == "__main__":
