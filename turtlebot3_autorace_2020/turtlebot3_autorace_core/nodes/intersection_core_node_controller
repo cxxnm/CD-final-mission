@@ -55,11 +55,11 @@ class CoreNodeController():
         self.CurrentMode = Enum(
             'CurrentMode',
             (
-                'idle '
-                'construction'
-                'intersection '
-                'lane_following '
-                'parking '
+                'idle',
+                'construction',
+                'intersection',
+                'lane_following',
+                'parking'
             )
         )
         self.current_mode = self.CurrentMode.idle.value
@@ -68,13 +68,14 @@ class CoreNodeController():
         self.Step = Enum(
             'Step', 
             (
-                'find_obstacle '
-                'avoid_obstacle '
-                'circling '
-                'parking '
+                'find_obstacle',
+                'avoid_obstacle',
+                'circling',
+                'parking',
                 'exit'
             )
         )
+
         self.current_step_construction = self.Step.find_obstacle.value
         self.current_step_intersection = self.Step.circling.value
         self.current_step_parking = self.Step.parking.value
@@ -82,19 +83,19 @@ class CoreNodeController():
         self.Launcher = Enum(
             'Launcher',
             (
-                'launch_camera_ex_calib '
-                'launch_detect_construction '
-                'launch_detect_construction_sign '
-                'launch_detect_intersection '
-                'launch_detect_intersection_sign ' 
-                'launch_detect_parking '
-                'launch_detect_parking_sign '
-                'launch_detect_lane '
-                'launch_control_lane '
+                'launch_camera_ex_calib',
+                'launch_detect_construction',
+                'launch_detect_construction_sign',
+                'launch_detect_intersection',
+                'launch_detect_intersection_sign', 
+                'launch_detect_parking',
+                'launch_detect_parking_sign',
+                'launch_detect_lane',
+                'launch_control_lane',
                 'launch_control_moving'
-            )
-            
-            )
+            )    
+        )
+
         self.uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         self.launch_camera_launched = False
