@@ -46,7 +46,7 @@ class DetectContruction():
 
     def cbConstructionOrder(self, order):
         msg_pub_construction_return = UInt8()
-
+        rospy.loginfo("CONSTRUCTION ORDER")
         if order.data == self.StepOfConstruction.find_obstacle.value:
             rospy.loginfo("find obstacle")
 

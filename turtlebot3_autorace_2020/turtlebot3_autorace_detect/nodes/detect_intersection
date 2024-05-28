@@ -58,7 +58,15 @@ class DetectIntersection:
         self.StepOfIntersection = Enum(
             "StepOfIntersection", "circling exit"
         )
-        self.TrafficSign = Enum("TrafficSign", "circle left")
+        self.TrafficSign = Enum(
+            "TrafficSign", 
+            (
+                "circle",
+                "left",
+                "parking",
+                "construction"
+            )
+        )
 
         self.is_moving_complete = False
         self.is_circle_detected = False
@@ -75,7 +83,7 @@ class DetectIntersection:
 
     def cbIntersectionOrder(self, order):
         msg_pub_intersection_return = UInt8()
-
+        rospy.loginfo("INTERSECTION ORDER")
         if order.data == self.StepOfIntersection.circling.value:
             if self.is_left_detected == True:
                 rospy.loginfo("go straight")
