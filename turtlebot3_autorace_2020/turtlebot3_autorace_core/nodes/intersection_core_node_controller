@@ -177,6 +177,7 @@ class CoreNodeController():
         rospy.loginfo(f"MODE: {self.current_mode}")
         # start
         if self.current_mode == self.CurrentMode.start.value:
+            rospy.loginfo("START MODE")
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
             self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
 
@@ -193,7 +194,8 @@ class CoreNodeController():
             self.fnLaunch(self.Launcher.launch_control_moving.value, False)
 
         # lane_following
-        if self.current_mode == self.CurrentMode.lane_following.value:
+        elif self.current_mode == self.CurrentMode.lane_following.value:
+            rospy.loginfo("LANE FOLLOWING MODE")
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
             self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
 
@@ -211,6 +213,7 @@ class CoreNodeController():
 
         # intersection
         elif self.current_mode == self.CurrentMode.intersection.value:
+            rospy.loginfo("INTERSECTION MODE")
             msg_pub_intersection_order = UInt8()
             if self.current_step_intersection == self.Step.circling.value:
                 msg_pub_intersection_order.data = self.Step.circling.value
@@ -239,6 +242,7 @@ class CoreNodeController():
         
         # parking
         elif self.current_mode == self.CurrentMode.parking.value:
+            rospy.loginfo("PARKING MODE")
             msg_pub_parking_order = UInt8()
             if self.current_step_parking == self.Step.parking.value:
                 msg_pub_parking_order.data = self.Step.parking.value
@@ -269,6 +273,7 @@ class CoreNodeController():
 
         # construction
         elif self.current_mode == self.CurrentMode.construction.value:
+            rospy.loginfo("CONSTRUCTION MODE")
             msg_pub_construction_order = UInt8()
             if self.current_step_construction == self.Step.find_obstacle.value:
                 msg_pub_construction_order.data = self.Step.find_obstacle.value
@@ -409,6 +414,7 @@ class CoreNodeController():
         
         # NODE: detect_construction && detect_construction_sign
         elif launch_num == self.Launcher.launch_detect_construction.value:
+            rospy.loginfo("START launch_detect_construction")
             if is_start == True:
                 if self.launch_detect_construction_launched == False:
                     self.launch_detect_construction = roslaunch.scriptapi.ROSLaunch()

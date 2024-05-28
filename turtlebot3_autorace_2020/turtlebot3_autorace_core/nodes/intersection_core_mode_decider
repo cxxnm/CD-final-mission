@@ -96,23 +96,38 @@ class CoreModeDecider:
                 ):  # intersection sign deteced
                     self.current_mode = self.CurrentMode.intersection.value
                     rospy.loginfo("detect sign : intersection")
-                if (
+                elif (
                     msg_data.data == self.TrafficSign.parking.value
                 ):  # parking sign deteced
                     self.current_mode = self.CurrentMode.parking.value
                     rospy.loginfo("detect sign : parking")
-                if (
+                elif (
                     msg_data.data == self.TrafficSign.construction.value
                 ):  # construction sign deteced
                     self.current_mode = self.CurrentMode.construction.value
                     rospy.loginfo("detect sign : construction")
-
+                self.fnPublishMode()
             else:
                 pass
+        elif (
+            msg_data.data == self.TrafficSign.circle.value
+        ):  # intersection sign deteced
+            self.current_mode = self.CurrentMode.intersection.value
+            rospy.loginfo("detect sign : intersection")
             self.fnPublishMode()
-
-        else:
-            pass
+        elif (
+            msg_data.data == self.TrafficSign.parking.value
+        ):  # parking sign deteced
+            self.current_mode = self.CurrentMode.parking.value
+            rospy.loginfo("detect sign : parking")
+            self.fnPublishMode()
+        elif (
+            msg_data.data == self.TrafficSign.construction.value
+        ):  # construction sign deteced
+            self.current_mode = self.CurrentMode.construction.value
+            rospy.loginfo("detect sign : construction")
+            self.fnPublishMode()
+            
 
     def fnPublishMode(self):
         decided_mode = UInt8()
