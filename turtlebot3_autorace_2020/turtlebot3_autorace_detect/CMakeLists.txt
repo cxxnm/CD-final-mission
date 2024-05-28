@@ -49,10 +49,12 @@ catkin_install_python(PROGRAMS
   nodes/detect_intersection
   nodes/detect_intersection_sign
   nodes/detect_lane
-  nodes/detect_level_crossing
-  nodes/detect_level_crossing_sign
+  nodes/detect_left
+  nodes/detect_left_sign
   nodes/detect_parking
   nodes/detect_parking_sign
+  nodes/detect_stop
+  nodes/detect_stop_sign
   nodes/detect_traffic_light
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
