@@ -28,20 +28,11 @@ class CoreModeDecider:
                 "circle",
                 "left",
                 "parking",
-                "construction"
+                "construction",
+                "stop"
             )
         )
-        self.CurrentMode = Enum(
-            'CurrentMode',
-            (
-                'idle',
-                'start',
-                'construction',
-                'intersection',
-                'lane_following',
-                'parking'
-            )
-        )
+        self.CurrentMode = Enum('CurrentMode', ['idle', 'start', 'construction', 'intersection', 'lane_following', 'parking', 'stopping', 'left'])
 
         self.fnInitMode()
 

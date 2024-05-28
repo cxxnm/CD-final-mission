@@ -14,21 +14,27 @@ class CoreNodeController():
         self.sub_construction_stamped = rospy.Subscriber('/detect/construction_stamped', UInt8, self.cbConstructionStamped, queue_size=1)
         self.sub_intersection_stamped = rospy.Subscriber('/detect/intersection_stamped', UInt8, self.cbIntersectionStamped, queue_size=1)
         self.sub_parking_stamped = rospy.Subscriber('/detect/parking_stamped', UInt8, self.cbParkingStamped, queue_size=1)
+        self.sub_left_stamped = rospy.Subscriber('/detect/left_stamped', UInt8, self.cbLeftStamped, queue_size=1)
+        self.sub_stop_stamped = rospy.Subscriber('/detect/stop_stamped', UInt8, self.cbStopStamped, queue_size=1)
 
         # Publish to topics
         self.pub_construction_order = rospy.Publisher('/detect/construction_order', UInt8, queue_size=1)
         self.pub_intersection_order = rospy.Publisher('/detect/intersection_order', UInt8, queue_size=1)
         self.pub_parking_order = rospy.Publisher('/detect/parking_order', UInt8, queue_size=1)
+        self.pub_left_order = rospy.Publisher('/detect/left_order', UInt8, queue_size=1)
+        self.pub_stop_order = rospy.Publisher('/detect/stop_order', UInt8, queue_size=1)
         self.pub_mode_return = rospy.Publisher('/core/returned_mode', UInt8, queue_size=1)
 
         # Define modes and steps
-        self.CurrentMode = Enum('CurrentMode', ['idle', 'start', 'construction', 'intersection', 'lane_following', 'parking'])
+        self.CurrentMode = Enum('CurrentMode', ['idle', 'start', 'construction', 'intersection', 'lane_following', 'parking', 'stopping', 'left'])
         self.current_mode = self.CurrentMode.idle.value
 
-        self.Step = Enum('Step', ['find_obstacle', 'avoid_obstacle', 'circling', 'parking', 'exit'])
+        self.Step = Enum('Step', ['find_obstacle', 'avoid_obstacle', 'circling', 'parking', 'left', 'stop', 'exit'])
         self.current_step_construction = self.Step.find_obstacle.value
         self.current_step_intersection = self.Step.circling.value
         self.current_step_parking = self.Step.parking.value
+        self.current_step_left = self.Step.left.value
+        self.current_step_stopping = self.Step.stop.value
 
         self.Launcher = Enum('Launcher', [
             'launch_camera_ex_calib',
@@ -38,6 +44,10 @@ class CoreNodeController():
             'launch_detect_intersection_sign',
             'launch_detect_parking',
             'launch_detect_parking_sign',
+            'launch_detect_left',
+            'launch_detect_left_sign',
+            'launch_detect_stop',
+            'launch_detect_stop_sign',
             'launch_detect_lane',
             'launch_control_lane',
             'launch_control_moving'
@@ -51,6 +61,10 @@ class CoreNodeController():
             'launch_detect_intersection_sign': 'turtlebot3_autorace_detect/launch/detect_intersection_sign.launch',
             'launch_detect_parking': 'turtlebot3_autorace_detect/launch/detect_parking.launch',
             'launch_detect_parking_sign': 'turtlebot3_autorace_detect/launch/detect_parking_sign.launch',
+            'launch_detect_left': 'turtlebot3_autorace_detect/launch/detect_left.launch',
+            'launch_detect_left_sign': 'turtlebot3_autorace_detect/launch/detect_left_sign.launch',
+            'launch_detect_stop': 'turtlebot3_autorace_detect/launch/detect_stop.launch',
+            'launch_detect_stop_sign': 'turtlebot3_autorace_detect/launch/detect_stop_sign.launch',
             'launch_detect_lane': 'turtlebot3_autorace_detect/launch/detect_lane.launch',
             'launch_control_lane': 'turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_lane.launch',
             'launch_control_moving': 'turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_moving.launch'
@@ -94,6 +108,16 @@ class CoreNodeController():
         rospy.loginfo(f"Parking step changed to: {parking_msg.data}")
         self.current_step_parking = parking_msg.data
         self.checkExitCondition(parking_msg.data, self.pub_parking_order)
+    
+    def cbLeftStamped(self, left_msg):
+        rospy.loginfo(f"Left step changed to: {left_msg.data}")
+        self.current_step_left = left_msg.data
+        self.checkExitCondition(left_msg.data, self.pub_left_order)
+    
+    def cbStopStamped(self, stopping_msg):
+        rospy.loginfo(f"Stopping step changed to: {stopping_msg.data}")
+        self.current_step_stopping = stopping_msg.data
+        self.checkExitCondition(stopping_msg.data, self.pub_stopping_order)
 
     def checkExitCondition(self, step, pub):
         if step == self.Step.exit.value:
@@ -117,6 +141,10 @@ class CoreNodeController():
             self.intersection_mode()
         elif self.current_mode == self.CurrentMode.parking.value:
             self.parking_mode()
+        elif self.current_mode == self.CurrentMode.left.value:
+            self.left_mode()
+        elif self.current_mode == self.CurrentMode.stopping.value:
+            self.stopping_mode()
         elif self.current_mode == self.CurrentMode.construction.value:
             self.construction_mode()
 
@@ -143,6 +171,20 @@ class CoreNodeController():
         msg_pub_parking_order = UInt8()
         msg_pub_parking_order.data = self.current_step_parking
         self.pub_parking_order.publish(msg_pub_parking_order)
+    
+    def left_mode(self):
+        rospy.loginfo("LEFT MODE")
+        self.stop_lane_detection()
+        msg_pub_left_order = UInt8()
+        msg_pub_left_order.data = self.current_step_left
+        self.pub_left_order.publish(msg_pub_left_order)
+    
+    def stopping_mode(self):
+        rospy.loginfo("STOPPING MODE")
+        self.stop_lane_detection()
+        msg_pub_stopping_order = UInt8()
+        msg_pub_stopping_order.data = self.current_step_stopping
+        self.pub_stopping_order.publish(msg_pub_stopping_order)
 
     def construction_mode(self):
         rospy.loginfo("CONSTRUCTION MODE")
@@ -165,6 +207,10 @@ class CoreNodeController():
         self.fnLaunch(self.Launcher.launch_detect_construction.name, True)
         self.fnLaunch(self.Launcher.launch_detect_parking_sign.name, True)
         self.fnLaunch(self.Launcher.launch_detect_parking.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_left_sign.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_left.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_stop_sign.name, True)
+        self.fnLaunch(self.Launcher.launch_detect_stop.name, True)
         self.fnLaunch(self.Launcher.launch_control_lane.name, True)
         self.fnLaunch(self.Launcher.launch_control_moving.name, True)
 

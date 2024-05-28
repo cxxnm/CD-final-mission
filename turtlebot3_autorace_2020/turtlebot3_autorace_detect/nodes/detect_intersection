@@ -63,6 +63,8 @@ class DetectIntersection:
                 'avoid_obstacle',
                 'circling',
                 'parking',
+                'left',
+                'stop',
                 'exit'
             )
         )
@@ -72,18 +74,16 @@ class DetectIntersection:
                 "circle",
                 "left",
                 "parking",
-                "construction"
+                "construction",
+                "stop"
             )
         )
 
         self.is_moving_complete = False
         self.is_circle_detected = False
-        self.is_left_detected = False
 
     def cbInvokedByTrafficSign(self, traffic_sign_type_msg):
-        if traffic_sign_type_msg.data == self.TrafficSign.left.value:
-            self.is_left_detected = True
-        elif traffic_sign_type_msg.data == self.TrafficSign.circle.value:
+        if traffic_sign_type_msg.data == self.TrafficSign.circle.value:
             self.is_circle_detected = True
 
     def cbMovingComplete(self, data):
@@ -91,35 +91,8 @@ class DetectIntersection:
 
     def cbIntersectionOrder(self, order):
         msg_pub_intersection_return = UInt8()
-        rospy.loginfo("[o]: INTERSECTION ORDER")
+        rospy.loginfo("INTERSECTION ORDER")
         if order.data == self.Step.circling.value:
-            if self.is_left_detected == True:
-                rospy.loginfo("go straight")
-                msg_moving = MovingParam()
-                msg_moving.moving_type = 4
-                msg_moving.moving_value_angular = 0
-                msg_moving.moving_value_linear = 0.15
-                self.pub_moving.publish(msg_moving)
-                while True:
-                    if self.is_moving_complete == True:
-                        break
-                self.is_moving_complete = False
-
-                rospy.sleep(1)
-
-                rospy.loginfo("go left")
-                msg_moving = MovingParam()
-                msg_moving.moving_type = 2
-                msg_moving.moving_value_angular = 85
-                msg_moving.moving_value_linear = 0.0
-                self.pub_moving.publish(msg_moving)
-                while True:
-                    if self.is_moving_complete == True:
-                        break
-                self.is_moving_complete = False
-
-                rospy.sleep(1)
-
             if self.is_circle_detected == True:
                 rospy.loginfo("go straight")
                 msg_moving = MovingParam()

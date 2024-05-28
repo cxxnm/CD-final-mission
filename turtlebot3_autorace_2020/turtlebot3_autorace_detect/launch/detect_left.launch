@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="turtlebot3_autorace_detect" type="detect_left" name="detect_left" output="screen">
+  </node>
+</launch>

@@ -112,10 +112,10 @@ class DetectSign:
         )
         dir_path += "image/"
 
-        self.img_circle = cv2.imread(dir_path + "circle.png", 0)
+        self.img_left = cv2.imread(dir_path + "left.png", 0)
 
-        self.kp_circle, self.des_circle = self.sift.detectAndCompute(
-            self.img_circle, None
+        self.kp_left, self.des_left = self.sift.detectAndCompute(
+            self.img_left, None
         )
 
         FLANN_INDEX_KDTREE = 0
@@ -154,37 +154,37 @@ class DetectSign:
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
 
-        matches_circle = self.flann.knnMatch(des1, self.des_circle, k=2)
+        matches_left = self.flann.knnMatch(des1, self.des_left, k=2)
 
         image_out_num = 1
 
-        good_circle = []
-        for m, n in matches_circle:
+
+        good_left = []
+        for m, n in matches_left:
             if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
-                good_circle.append(m)
-        if len(good_circle) > MIN_MATCH_COUNT:
+                good_left.append(m)
+        if len(good_left) > MIN_MATCH_COUNT:
             src_pts = np.float32(
-                [kp1[m.queryIdx].pt for m in good_circle]
+                [kp1[m.queryIdx].pt for m in good_left]
             ).reshape(-1, 1, 2)
             dst_pts = np.float32(
-                [self.kp_circle[m.trainIdx].pt for m in good_circle]
+                [self.kp_left[m.trainIdx].pt for m in good_left]
             ).reshape(-1, 1, 2)
 
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 3.0)  # lowered from 5.0 to 3.0
-            matches_circle = mask.ravel().tolist()
+            matches_left = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)
             if mse < MIN_MSE_DECISION:
                 msg_sign = UInt8()
-                msg_sign.data = self.TrafficSign.circle.value
+                msg_sign.data = self.TrafficSign.left.value
 
                 self.pub_traffic_sign.publish(msg_sign)
-                rospy.loginfo("detect circle sign")
-                image_out_num = 2
+                rospy.loginfo("detect left sign")
+                image_out_num = 3
 
         else:
-            matches_circle = None
-
+            matches_left = None
 
         if image_out_num == 1:
             if self.pub_image_type == "compressed":
@@ -201,36 +201,36 @@ class DetectSign:
                     self.cvBridge.cv2_to_imgmsg(cv_image_input, "bgr8")
                 )
 
-        elif image_out_num == 2:
-            draw_params_circle = dict(
+
+        elif image_out_num == 3:
+            draw_params_left = dict(
                 matchColor=(255, 0, 0),  # draw matches in green color
                 singlePointColor=None,
-                matchesMask=matches_circle,  # draw only inliers
+                matchesMask=matches_left,  # draw only inliers
                 flags=2,
             )
 
-            final_circle = cv2.drawMatches(
+            final_left = cv2.drawMatches(
                 cv_image_input,
                 kp1,
-                self.img_circle,
-                self.kp_circle,
-                good_circle,
+                self.img_left,
+                self.kp_left,
+                good_left,
                 None,
-                **draw_params_circle,
+                **draw_params_left,
             )
 
             if self.pub_image_type == "compressed":
                 # publishes traffic sign image in compressed type
                 self.pub_image_traffic_sign.publish(
-                    self.cvBridge.cv2_to_compressed_imgmsg(final_circle, "jpg")
+                    self.cvBridge.cv2_to_compressed_imgmsg(final_left, "jpg")
                 )
 
             elif self.pub_image_type == "raw":
                 # publishes traffic sign image in raw type
                 self.pub_image_traffic_sign.publish(
-                    self.cvBridge.cv2_to_imgmsg(final_circle, "bgr8")
+                    self.cvBridge.cv2_to_imgmsg(final_left, "bgr8")
                 )
-
 
     def main(self):
         rospy.spin()

@@ -77,13 +77,27 @@ class DetectSign:
             )
 
         self.cvBridge = CvBridge()
+        # STEPS
+        self.Step = Enum(
+            'Step', 
+            (
+                'find_obstacle',
+                'avoid_obstacle',
+                'circling',
+                'parking',
+                'left',
+                'stop',
+                'exit'
+            )
+        )
         self.TrafficSign = Enum(
             "TrafficSign", 
             (
                 "circle",
                 "left",
                 "parking",
-                "construction"
+                "construction",
+                "stop"
             )
         )
         self.counter = 1

@@ -44,7 +44,19 @@ class DetectParking():
                 'avoid_obstacle',
                 'circling',
                 'parking',
+                'left',
+                'stop',
                 'exit'
+            )
+        )
+        self.TrafficSign = Enum(
+            "TrafficSign", 
+            (
+                "circle",
+                "left",
+                "parking",
+                "construction",
+                "stop"
             )
         )
         self.is_moving_complete = False
