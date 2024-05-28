@@ -2,7 +2,7 @@ import rospy
 import roslaunch
 import os
 from enum import Enum
-from std_msgs.msg import UInt8, Float64
+from std_msgs.msg import UInt8
 
 class CoreNodeController():
     def __init__(self):
@@ -18,7 +18,7 @@ class CoreNodeController():
         # Publish to topics
         self.pub_construction_order = rospy.Publisher('/detect/construction_order', UInt8, queue_size=1)
         self.pub_intersection_order = rospy.Publisher('/detect/intersection_order', UInt8, queue_size=1)
-        self.pub_parking_order = rospy.Publisher('/detect/parking_order', UInt8, queue_size=1)   
+        self.pub_parking_order = rospy.Publisher('/detect/parking_order', UInt8, queue_size=1)
         self.pub_mode_return = rospy.Publisher('/core/returned_mode', UInt8, queue_size=1)
 
         # Define modes and steps
@@ -35,7 +35,7 @@ class CoreNodeController():
             'launch_detect_construction',
             'launch_detect_construction_sign',
             'launch_detect_intersection',
-            'launch_detect_intersection_sign', 
+            'launch_detect_intersection_sign',
             'launch_detect_parking',
             'launch_detect_parking_sign',
             'launch_detect_lane',
@@ -127,25 +127,34 @@ class CoreNodeController():
 
     def lane_following_mode(self):
         rospy.loginfo("LANE FOLLOWING MODE")
-        self.launch_all_nodes_except(['launch_detect_intersection', 'launch_detect_construction', 'launch_detect_parking'])
+        self.launch_node('launch_detect_lane', True)
+        self.launch_node('launch_control_lane', True)
         
     def intersection_mode(self):
         rospy.loginfo("INTERSECTION MODE")
+        self.stop_lane_detection()
         msg_pub_intersection_order = UInt8()
         msg_pub_intersection_order.data = self.current_step_intersection
         self.pub_intersection_order.publish(msg_pub_intersection_order)
 
     def parking_mode(self):
         rospy.loginfo("PARKING MODE")
+        self.stop_lane_detection()
         msg_pub_parking_order = UInt8()
         msg_pub_parking_order.data = self.current_step_parking
         self.pub_parking_order.publish(msg_pub_parking_order)
 
     def construction_mode(self):
         rospy.loginfo("CONSTRUCTION MODE")
+        self.stop_lane_detection()
         msg_pub_construction_order = UInt8()
         msg_pub_construction_order.data = self.current_step_construction
         self.pub_construction_order.publish(msg_pub_construction_order)
+
+    def stop_lane_detection(self):
+        rospy.loginfo("STOP LANE DETECTION")
+        self.fnLaunch('launch_detect_lane', False)
+        self.fnLaunch('launch_control_lane', False)
 
     def launch_all_nodes(self):
         self.fnLaunch(self.Launcher.launch_camera_ex_calib.name, True)
@@ -158,11 +167,6 @@ class CoreNodeController():
         self.fnLaunch(self.Launcher.launch_detect_parking.name, True)
         self.fnLaunch(self.Launcher.launch_control_lane.name, True)
         self.fnLaunch(self.Launcher.launch_control_moving.name, True)
-
-    def launch_all_nodes_except(self, exclude_list):
-        for launcher in self.Launcher:
-            if launcher.name not in exclude_list:
-                self.fnLaunch(launcher.name, True)
 
     def fnLaunch(self, node_name, is_start):
         launch_file = self.launch_files[node_name]
