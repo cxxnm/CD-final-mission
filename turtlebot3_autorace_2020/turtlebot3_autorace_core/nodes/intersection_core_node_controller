@@ -127,8 +127,8 @@ class CoreNodeController():
 
     def lane_following_mode(self):
         rospy.loginfo("LANE FOLLOWING MODE")
-        self.launch_node('launch_detect_lane', True)
-        self.launch_node('launch_control_lane', True)
+        self.fnLaunch('launch_detect_lane', True)
+        self.fnLaunch('launch_control_lane', True)
         
     def intersection_mode(self):
         rospy.loginfo("INTERSECTION MODE")
