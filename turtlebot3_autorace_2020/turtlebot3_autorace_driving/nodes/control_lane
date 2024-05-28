@@ -37,7 +37,7 @@ class ControlLane:
         )
 
         self.lastError = 0
-        self.MAX_VEL = 1
+        self.MAX_VEL = 5
 
         rospy.on_shutdown(self.fnShutDown)
 
