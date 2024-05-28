@@ -1,5 +1,4 @@
-import rospy
-import roslaunch
+import rospy, roslaunch
 import os
 from enum import Enum
 from std_msgs.msg import UInt8, Float64
@@ -160,13 +159,13 @@ class CoreNodeController():
         if is_start:
             if not launch:
                 rospy.loginfo(f"Starting {node_name}")
-                launch = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
-                self.processes[launch_num] = launch
-                launch.start()
+                parent = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
+                self.processes[launch_num] = parent
+                parent.start()
         else:
             if launch:
                 rospy.loginfo(f"Stopping {node_name}")
-                launch.shutdown()
+                self.processes[launch_num].shutdown()
                 self.processes[launch_num] = None
 
     def main(self):
