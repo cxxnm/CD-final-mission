@@ -150,24 +150,20 @@ class CoreNodeController():
                 self.fnLaunch(launcher.value, True)
 
     def fnLaunch(self, launch_num, is_start):
-        if launch_num not in self.processes:
-            self.processes[launch_num] = roslaunch.scriptapi.ROSLaunch()
-
-        launch = self.processes[launch_num]
         node_name = self.Launcher(launch_num).name
 
         if is_start:
-            if launch:
+            if launch_num in self.processes and self.processes[launch_num] is not None:
                 rospy.loginfo(f"{node_name} is already launched.")
             else:
                 rospy.loginfo(f"Starting {node_name}")
-                launch = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
-                self.processes[launch_num] = launch
-                launch.start()
+                parent = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
+                self.processes[launch_num] = parent
+                parent.start()
         else:
-            if launch:
+            if launch_num in self.processes and self.processes[launch_num] is not None:
                 rospy.loginfo(f"Stopping {node_name}")
-                launch.shutdown()
+                self.processes[launch_num].shutdown()
                 self.processes[launch_num] = None
 
     def main(self):
