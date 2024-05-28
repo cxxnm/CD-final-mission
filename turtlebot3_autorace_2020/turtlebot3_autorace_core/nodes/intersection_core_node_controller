@@ -179,8 +179,6 @@ class CoreNodeController():
         if self.current_mode == self.CurrentMode.start.value:
             rospy.loginfo("Start MISSION!")
 
-            msg_pub_intersection_order.data = self.Step.circling.value
-
             # CAMERA
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
 
@@ -200,9 +198,6 @@ class CoreNodeController():
 
             # MOVING
             self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-            rospy.sleep(3)
-            self.pub_intersection_order.publish(msg_pub_intersection_order)
 
         # lane_following
         elif self.current_mode == self.CurrentMode.lane_following.value:
