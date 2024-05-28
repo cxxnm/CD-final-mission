@@ -55,7 +55,6 @@ class CoreNodeController():
         self.CurrentMode = Enum(
             'CurrentMode',
             (
-                'start',
                 'idle',
                 'construction',
                 'intersection',
@@ -121,7 +120,7 @@ class CoreNodeController():
         while not rospy.is_shutdown():
 
             if self.is_started == True:
-                self.current_mode = self.CurrentMode.start.value
+                self.current_mode = self.CurrentMode.lane_following.value
                 self.fnControlNode()
                 self.is_started = False
 
@@ -176,14 +175,11 @@ class CoreNodeController():
         # start 
 
         rospy.loginfo(f"MODE: {self.current_mode}")
-
-        if self.current_mode == self.CurrentMode.start.value:
-            rospy.loginfo("Start MISSION!")
-
-            # CAMERA
+        # lane_following
+        if self.current_mode == self.CurrentMode.lane_following.value:
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
+            self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
 
-            # Traffic Sign DETECTION
             self.fnLaunch(self.Launcher.launch_detect_intersection.value, True)
             self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
 
@@ -193,29 +189,8 @@ class CoreNodeController():
             self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
             self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
 
-            # LANE
-            self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
             self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-
-            # MOVING
-            self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-        # lane_following
-        elif self.current_mode == self.CurrentMode.lane_following.value:
-            self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_intersection.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_construction.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-            self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+            self.fnLaunch(self.Launcher.launch_control_moving.value, True)
 
         # intersection
         elif self.current_mode == self.CurrentMode.intersection.value:

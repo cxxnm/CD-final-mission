@@ -55,7 +55,6 @@ class CoreModeDecider:
         self.CurrentMode = Enum(
             'CurrentMode',
             (
-                'start',
                 'idle',
                 'construction',
                 'intersection',
