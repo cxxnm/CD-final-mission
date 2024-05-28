@@ -117,7 +117,7 @@ class DetectSign:
 
     def cbFindTrafficSign(self, image_msg):
         # drop the frame to 1/5 (6fps) because of the processing speed. This is up to your computer's operating power.
-        if self.counter % 5 != 0:
+        if self.counter % 3 != 0:
             self.counter += 1
             return
         else:
@@ -130,8 +130,8 @@ class DetectSign:
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 9  # 9
-        MIN_MSE_DECISION = 50000
+        MIN_MATCH_COUNT = 10  # increased from 9 to 10
+        MIN_MSE_DECISION = 40000  # lowered from 50000 to 40000
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
@@ -143,7 +143,7 @@ class DetectSign:
 
         good_circle = []
         for m, n in matches_circle:
-            if m.distance < 0.7 * n.distance:
+            if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
                 good_circle.append(m)
         if len(good_circle) > MIN_MATCH_COUNT:
             src_pts = np.float32(
@@ -153,7 +153,7 @@ class DetectSign:
                 [self.kp_circle[m.trainIdx].pt for m in good_circle]
             ).reshape(-1, 1, 2)
 
-            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 3.0)  # lowered from 5.0 to 3.0
             matches_circle = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)
@@ -171,7 +171,7 @@ class DetectSign:
 
         good_left = []
         for m, n in matches_left:
-            if m.distance < 0.7 * n.distance:
+            if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
                 good_left.append(m)
         if len(good_left) > MIN_MATCH_COUNT:
             src_pts = np.float32(
@@ -181,7 +181,7 @@ class DetectSign:
                 [self.kp_left[m.trainIdx].pt for m in good_left]
             ).reshape(-1, 1, 2)
 
-            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 3.0)  # lowered from 5.0 to 3.0
             matches_left = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)

@@ -96,8 +96,9 @@ class DetectSign():
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 8 #9
-        MIN_MSE_DECISION = 50000
+        MIN_MATCH_COUNT = 5 #9
+        MIN_MSE_DECISION = 60000
+        ratio_test_threshold = 0.75  # Adjust this threshold
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input,None)
@@ -107,8 +108,8 @@ class DetectSign():
         image_out_num = 1
 
         good_construction = []
-        for m,n in matches_construction:
-            if m.distance < 0.7*n.distance:
+        for m, n in matches_construction:
+            if m.distance < ratio_test_threshold * n.distance:
                 good_construction.append(m)
         if len(good_construction)>MIN_MATCH_COUNT:
             src_pts = np.float32([kp1[m.queryIdx].pt for m in good_construction ]).reshape(-1,1,2)
