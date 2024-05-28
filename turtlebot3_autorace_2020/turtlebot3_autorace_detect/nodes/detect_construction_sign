@@ -118,61 +118,65 @@ class DetectSign():
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 6
+        MIN_MATCH_COUNT = 8
         MIN_MSE_DECISION = 50000
-        ratio_test_threshold = 0.75  # Adjust this threshold
-        MIN_BBOX_SIZE = 1000  # Minimum bounding box area to consider the sign as close
+        ratio_test_threshold = 0.85
 
         # find the keypoints and descriptors with SIFT
-        kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
+        kp1, des1 = self.sift.detectAndCompute(cv_image_input,None)
 
-        matches_construction = self.flann.knnMatch(des1, self.des_construction, k=2)
+        matches_construction = self.flann.knnMatch(des1,self.des_construction,k=2)
+      
+        image_out_num = 1
 
         good_construction = []
         for m, n in matches_construction:
             if m.distance < ratio_test_threshold * n.distance:
                 good_construction.append(m)
 
-        if len(good_construction) > MIN_MATCH_COUNT:
-            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_construction]).reshape(-1, 1, 2)
-            dst_pts = np.float32([self.kp_construction[m.trainIdx].pt for m in good_construction]).reshape(-1, 1, 2)
+        if len(good_construction)>MIN_MATCH_COUNT:
+            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_construction ]).reshape(-1,1,2)
+            dst_pts = np.float32([self.kp_construction[m.trainIdx].pt for m in good_construction]).reshape(-1,1,2)
 
-            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-            if M is not None:
-                matches_construction = mask.ravel().tolist()
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+            matches_construction = mask.ravel().tolist()
 
-                mse = self.fnCalcMSE(src_pts, dst_pts)
-                if mse < MIN_MSE_DECISION:
-                    # Estimate the bounding box size of the detected sign
-                    h, w = self.img_construction.shape[:2]
-                    pts = np.float32([[0, 0], [0, h-1], [w-1, h-1], [w-1, 0]]).reshape(-1, 1, 2)
-                    dst = cv2.perspectiveTransform(pts, M)
-                    bbox_area = cv2.contourArea(dst)
+            mse = self.fnCalcMSE(src_pts, dst_pts)
+            if mse < MIN_MSE_DECISION:
+                msg_sign = UInt8()
+                msg_sign.data = self.TrafficSign.construction.value
 
-                    if bbox_area > MIN_BBOX_SIZE:
-                        msg_sign = UInt8()
-                        msg_sign.data = self.TrafficSign.construction.value
+                self.pub_traffic_sign.publish(msg_sign)
 
-                        self.pub_traffic_sign.publish(msg_sign)
-                        rospy.loginfo("Construction sign detected")
+                rospy.loginfo("Construction found")
+                image_out_num = 2
+        else:
+            matches_construction = None
+      
+        if image_out_num == 1:
+            if self.pub_image_type == "compressed":
+                # publishes traffic sign image in compressed type
+                self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_compressed_imgmsg(cv_image_input, "jpg"))
 
-                        draw_params_construction = dict(matchColor=(255, 0, 0),  # draw matches in red color
-                                                        singlePointColor=None,
-                                                        matchesMask=matches_construction,  # draw only inliers
-                                                        flags=2)
+            elif self.pub_image_type == "raw":
+                # publishes traffic sign image in raw type
+                self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_imgmsg(cv_image_input, "bgr8"))
 
-                        final_construction = cv2.drawMatches(cv_image_input, kp1, self.img_construction, self.kp_construction, good_construction, None, **draw_params_construction)
+        elif image_out_num == 2:
+            draw_params_construction = dict(matchColor = (255,0,0), # draw matches in green color
+                        singlePointColor = None,
+                        matchesMask = matches_construction, # draw only inliers
+                        flags = 2)
 
-                        if self.pub_image_type == "compressed":
-                            self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_compressed_imgmsg(final_construction, "jpg"))
-                        elif self.pub_image_type == "raw":
-                            self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_imgmsg(final_construction, "bgr8"))
-                        return
+            final_construction = cv2.drawMatches(cv_image_input,kp1,self.img_construction,self.kp_construction,good_construction,None,**draw_params_construction)
 
-        if self.pub_image_type == "compressed":
-            self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_compressed_imgmsg(cv_image_input, "jpg"))
-        elif self.pub_image_type == "raw":
-            self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_imgmsg(cv_image_input, "bgr8"))
+            if self.pub_image_type == "compressed":
+                # publishes traffic sign image in compressed type
+                self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_compressed_imgmsg(final_construction, "jpg"))
+
+            elif self.pub_image_type == "raw":
+                # publishes traffic sign image in raw type
+                self.pub_image_traffic_sign.publish(self.cvBridge.cv2_to_imgmsg(final_construction, "bgr8"))
 
     def main(self):
         rospy.spin()
