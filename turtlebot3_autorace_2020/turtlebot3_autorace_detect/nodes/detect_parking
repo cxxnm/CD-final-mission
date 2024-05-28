@@ -50,6 +50,7 @@ class DetectParking():
         self.is_moving_complete = False
 
     def cbMovingComplete(self, data):
+        rospy.loginfo("Moving complete!")
         self.is_moving_complete = True
 
     def cbParkingOrder(self, order):
