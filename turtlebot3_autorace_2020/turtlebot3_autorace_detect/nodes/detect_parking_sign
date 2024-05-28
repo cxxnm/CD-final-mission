@@ -127,8 +127,8 @@ class DetectSign:
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 9
-        MIN_MSE_DECISION = 50000
+        MIN_MATCH_COUNT = 5  # Lowered the match count threshold
+        MIN_MSE_DECISION = 70000  # Increased the MSE threshold
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
@@ -140,6 +140,8 @@ class DetectSign:
         for m, n in matches_parking:
             if m.distance < 0.7 * n.distance:
                 good_parking.append(m)
+
+        rospy.loginfo(f"Number of good matches: {len(good_parking)}")
 
         if len(good_parking) > MIN_MATCH_COUNT:
             src_pts = np.float32(
@@ -153,6 +155,7 @@ class DetectSign:
             matchesMask_parking = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)
+            rospy.loginfo(f"MSE: {mse}")
             if mse < MIN_MSE_DECISION:
                 msg_sign = UInt8()
                 msg_sign.data = self.TrafficSign.parking.value
