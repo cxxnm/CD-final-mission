@@ -1,479 +1,173 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-################################################################################
-# Copyright 2018 ROBOTIS CO., LTD.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-################################################################################
-
-# Authors: Leon Jung, [AuTURBO] Kihoon Kim (https://github.com/auturbo), Gilbert, Ashe Kim
-
-import rospy, roslaunch
-import subprocess
+import rospy
+import roslaunch
 import os
-import sys
 from enum import Enum
 from std_msgs.msg import UInt8, Float64
- 
+
 class CoreNodeController():
     def __init__(self):
         self.ros_package_path = os.path.dirname(os.path.realpath(__file__))
         self.ros_package_path = self.ros_package_path.replace('turtlebot3_autorace_core/nodes', '')
 
-        # subscribes : status returned
+        # Subscribe to topics
         self.sub_mode_control = rospy.Subscriber('/core/decided_mode', UInt8, self.cbReceiveMode, queue_size=1)
-
-        # subscrivers Stamps
         self.sub_construction_stamped = rospy.Subscriber('/detect/construction_stamped', UInt8, self.cbConstructionStamped, queue_size=1)
         self.sub_intersection_stamped = rospy.Subscriber('/detect/intersection_stamped', UInt8, self.cbIntersectionStamped, queue_size=1)
         self.sub_parking_stamped = rospy.Subscriber('/detect/parking_stamped', UInt8, self.cbParkingStamped, queue_size=1)
 
-        # publishes orders:
-
-        # CONSTRUCTION
+        # Publish to topics
         self.pub_construction_order = rospy.Publisher('/detect/construction_order', UInt8, queue_size=1)
-
-        # INTERSECTION
         self.pub_intersection_order = rospy.Publisher('/detect/intersection_order', UInt8, queue_size=1)
-
-        # PARKING
         self.pub_parking_order = rospy.Publisher('/detect/parking_order', UInt8, queue_size=1)   
-
-        # MODE
         self.pub_mode_return = rospy.Publisher('/core/returned_mode', UInt8, queue_size=1)
-        self.CurrentMode = Enum(
-            'CurrentMode',
-            (
-                'idle',
-                'start',
-                'construction',
-                'intersection',
-                'lane_following',
-                'parking'
-            )
-        )
-        self.current_mode = self.CurrentMode.idle.value
-        
-        # STEPS
-        self.Step = Enum(
-            'Step', 
-            (
-                'find_obstacle',
-                'avoid_obstacle',
-                'circling',
-                'parking',
-                'exit'
-            )
-        )
 
+        # Define modes and steps
+        self.CurrentMode = Enum('CurrentMode', ['idle', 'start', 'construction', 'intersection', 'lane_following', 'parking'])
+        self.current_mode = self.CurrentMode.idle.value
+
+        self.Step = Enum('Step', ['find_obstacle', 'avoid_obstacle', 'circling', 'parking', 'exit'])
         self.current_step_construction = self.Step.find_obstacle.value
         self.current_step_intersection = self.Step.circling.value
         self.current_step_parking = self.Step.parking.value
-        
-        self.Launcher = Enum(
-            'Launcher',
-            (
-                'launch_camera_ex_calib',
-                'launch_detect_construction',
-                'launch_detect_construction_sign',
-                'launch_detect_intersection',
-                'launch_detect_intersection_sign', 
-                'launch_detect_parking',
-                'launch_detect_parking_sign',
-                'launch_detect_lane',
-                'launch_control_lane',
-                'launch_control_moving'
-            )    
-        )
+
+        self.Launcher = Enum('Launcher', [
+            'launch_camera_ex_calib',
+            'launch_detect_construction',
+            'launch_detect_construction_sign',
+            'launch_detect_intersection',
+            'launch_detect_intersection_sign', 
+            'launch_detect_parking',
+            'launch_detect_parking_sign',
+            'launch_detect_lane',
+            'launch_control_lane',
+            'launch_control_moving'
+        ])
 
         self.uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        
-        self.launch_camera_launched = False
-        self.launch_detect_lane_launched = False
-    
-        self.launch_detect_construction_launched = False
-        self.launch_detect_construction_sign_launched = False
-
-        self.launch_detect_intersection_launched = False
-        self.launch_detect_intersection_sign_launched = False
-
-        self.launch_detect_parking_launched = False
-        self.launch_detect_parking_sign_launched = False
-
-        self.launch_control_lane_launched = False
-        self.launch_control_moving_launched = False
-
+        self.processes = {}
         self.is_triggered = False
         self.is_started = True
 
         loop_rate = rospy.Rate(10) # 10hz
-
         while not rospy.is_shutdown():
-
-            if self.is_started == True:
+            if self.is_started:
                 self.current_mode = self.CurrentMode.start.value
                 self.fnControlNode()
                 self.is_started = False
 
-            if self.is_triggered == True:
+            if self.is_triggered:
                 self.fnControlNode()
+                self.is_triggered = False
             
             loop_rate.sleep()
 
     def cbReceiveMode(self, mode_msg):
-        rospy.loginfo("starts the progress with %d", mode_msg.data)
-        
+        rospy.loginfo(f"Received mode: {mode_msg.data}")
         self.current_mode = mode_msg.data
         self.is_triggered = True
 
     def cbConstructionStamped(self, construction_msg):
-        rospy.loginfo("construction Step changed from %d", self.current_step_construction)
+        rospy.loginfo(f"Construction step changed to: {construction_msg.data}")
         self.current_step_construction = construction_msg.data
-
-        if self.current_step_construction == self.Step.exit.value:
-            self.current_mode = self.CurrentMode.lane_following.value
-            msg_mode_return = UInt8()
-            msg_mode_return.data = self.current_mode
-            self.pub_mode_return.publish(msg_mode_return)
-        
-        self.is_triggered = True
+        self.checkExitCondition(construction_msg.data, self.pub_construction_order)
 
     def cbIntersectionStamped(self, intersection_msg):
-        rospy.loginfo("intersection Step changed from %d", self.current_step_intersection)
+        rospy.loginfo(f"Intersection step changed to: {intersection_msg.data}")
         self.current_step_intersection = intersection_msg.data
-
-        if self.current_step_intersection == self.Step.exit.value:
-            self.current_mode = self.CurrentMode.lane_following.value
-            msg_mode_return = UInt8()
-            msg_mode_return.data = self.current_mode
-            self.pub_mode_return.publish(msg_mode_return)
-        
-        self.is_triggered = True
+        self.checkExitCondition(intersection_msg.data, self.pub_intersection_order)
     
     def cbParkingStamped(self, parking_msg):
-        rospy.loginfo("parking Step changed from %d", self.current_step_parking)
+        rospy.loginfo(f"Parking step changed to: {parking_msg.data}")
         self.current_step_parking = parking_msg.data
+        self.checkExitCondition(parking_msg.data, self.pub_parking_order)
 
-        if self.current_step_intersection == self.Step.exit.value:
+    def checkExitCondition(self, step, pub):
+        if step == self.Step.exit.value:
             self.current_mode = self.CurrentMode.lane_following.value
             msg_mode_return = UInt8()
             msg_mode_return.data = self.current_mode
             self.pub_mode_return.publish(msg_mode_return)
-        
-        self.is_triggered = True
+            self.is_triggered = True
+        else:
+            self.is_triggered = True
+            pub.publish(step)
 
-    def fnControlNode(self): 
-        rospy.loginfo(f"MODE: {self.current_mode}")
-        # start
+    def fnControlNode(self):
+        rospy.loginfo(f"Current mode: {self.CurrentMode(self.current_mode).name}")
+
         if self.current_mode == self.CurrentMode.start.value:
-            rospy.loginfo("START MODE")
-            self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_intersection.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
-
-            self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-            self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-        # lane_following
+            self.start_mode()
         elif self.current_mode == self.CurrentMode.lane_following.value:
-            rospy.loginfo("LANE FOLLOWING MODE")
-            self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-            self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_intersection.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_construction.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
-            self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
-
-            self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-            self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-        # intersection
+            self.lane_following_mode()
         elif self.current_mode == self.CurrentMode.intersection.value:
-            rospy.loginfo("INTERSECTION MODE")
-            msg_pub_intersection_order = UInt8()
-            if self.current_step_intersection == self.Step.circling.value:
-                msg_pub_intersection_order.data = self.Step.circling.value
-
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-                self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_intersection.value, True)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, True)
-
-            elif self.current_step_intersection == self.Step.exit.value:
-                msg_pub_intersection_order.data = self.Step.exit.value
-
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-                self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_intersection.value, False)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-            rospy.sleep(3)
-            self.pub_intersection_order.publish(msg_pub_intersection_order)
-        
-        # parking
+            self.intersection_mode()
         elif self.current_mode == self.CurrentMode.parking.value:
-            rospy.loginfo("PARKING MODE")
-            msg_pub_parking_order = UInt8()
-            if self.current_step_parking == self.Step.parking.value:
-                msg_pub_parking_order.data = self.Step.parking.value
-
-                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-                self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, False)
-                self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, False)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, True)
-
-            elif self.current_step_parking == self.Step.exit.value:
-                msg_pub_parking_order.data = self.Step.exit.value
-
-                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
-
-                self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-            rospy.sleep(3)
-            self.pub_parking_order.publish(msg_pub_parking_order)
-
-        # construction
+            self.parking_mode()
         elif self.current_mode == self.CurrentMode.construction.value:
-            rospy.loginfo("CONSTRUCTION MODE")
-            msg_pub_construction_order = UInt8()
-            if self.current_step_construction == self.Step.find_obstacle.value:
-                msg_pub_construction_order.data = self.Step.find_obstacle.value
+            self.construction_mode()
 
-                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+    def start_mode(self):
+        rospy.loginfo("START MODE")
+        self.launch_all_nodes()
+        self.current_mode = self.CurrentMode.lane_following.value
 
-                self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, False)
+    def lane_following_mode(self):
+        rospy.loginfo("LANE FOLLOWING MODE")
+        self.launch_all_nodes_except(['launch_detect_intersection', 'launch_detect_construction', 'launch_detect_parking'])
+        
+    def intersection_mode(self):
+        rospy.loginfo("INTERSECTION MODE")
+        msg_pub_intersection_order = UInt8()
+        msg_pub_intersection_order.data = self.current_step_intersection
+        self.pub_intersection_order.publish(msg_pub_intersection_order)
 
-                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+    def parking_mode(self):
+        rospy.loginfo("PARKING MODE")
+        msg_pub_parking_order = UInt8()
+        msg_pub_parking_order.data = self.current_step_parking
+        self.pub_parking_order.publish(msg_pub_parking_order)
 
-            elif self.current_step_construction == self.Step.avoid_obstacle.value:
-                msg_pub_construction_order.data = self.Step.avoid_obstacle.value
+    def construction_mode(self):
+        rospy.loginfo("CONSTRUCTION MODE")
+        msg_pub_construction_order = UInt8()
+        msg_pub_construction_order.data = self.current_step_construction
+        self.pub_construction_order.publish(msg_pub_construction_order)
 
-                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+    def launch_all_nodes(self):
+        self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_intersection.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
+        self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
+        self.fnLaunch(self.Launcher.launch_control_lane.value, True)
+        self.fnLaunch(self.Launcher.launch_control_moving.value, False)
 
-                self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, False)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, False)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, True)
-
-            elif self.current_step_construction == self.Step.exit.value:
-                msg_pub_construction_order.data = self.Step.exit.value
-
-                self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
-                self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
-
-                self.fnLaunch(self.Launcher.launch_detect_construction.value, False)
-                self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
-
-                self.fnLaunch(self.Launcher.launch_control_lane.value, True)
-                self.fnLaunch(self.Launcher.launch_control_moving.value, False)
-
-            rospy.sleep(2)
-            self.pub_construction_order.publish(msg_pub_construction_order)
+    def launch_all_nodes_except(self, exclude_list):
+        for launcher in self.Launcher:
+            if launcher.name not in exclude_list:
+                self.fnLaunch(launcher.value, True)
 
     def fnLaunch(self, launch_num, is_start):
-        # NODE: extrinsic_camera
-        if launch_num == self.Launcher.launch_camera_ex_calib.value:
-            if is_start == True:
-                if self.launch_camera_launched == False:
-                    self.launch_camera = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_camera = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_camera/launch/extrinsic_camera_calibration.launch"])
-                    self.launch_camera_launched = True
-                    self.launch_camera.start()
-                else:
-                    pass
-            else:
-                if self.launch_camera_launched == True:
-                    self.launch_camera_launched = False
-                    self.launch_camera.shutdown()
-                else:
-                    pass
+        if launch_num not in self.processes:
+            self.processes[launch_num] = roslaunch.scriptapi.ROSLaunch()
 
-        # NODE: detect_lane
-        elif launch_num == self.Launcher.launch_detect_lane.value:
-            if is_start == True:
-                if self.launch_detect_lane_launched == False:
-                    self.launch_detect_lane = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_lane = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_lane.launch"])
-                    self.launch_detect_lane_launched = True
-                    self.launch_detect_lane.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_lane_launched == True:
-                    self.launch_detect_lane_launched = False
-                    self.launch_detect_lane.shutdown()
-                else:
-                    pass
+        launch = self.processes[launch_num]
+        node_name = self.Launcher(launch_num).name
 
-        # NODE: detect_intersection && detect_intersection_sign
-        elif launch_num == self.Launcher.launch_detect_intersection.value:
-            if is_start == True:
-                if self.launch_detect_intersection_launched == False:
-                    self.launch_detect_intersection = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_intersection = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_intersection.launch"])
-                    self.launch_detect_intersection_launched = True
-                    self.launch_detect_intersection.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_intersection_launched == True:
-                    self.launch_detect_intersection_launched = False
-                    self.launch_detect_intersection.shutdown()
-                pass
-        elif launch_num == self.Launcher.launch_detect_intersection_sign.value:
-            if is_start == True:
-                if self.launch_detect_intersection_sign_launched == False:
-                    self.launch_detect_intersection_sign = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_intersection_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_intersection_sign.launch"])
-                    self.launch_detect_intersection_sign_launched = True
-                    self.launch_detect_intersection_sign.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_intersection_sign_launched == True:
-                    self.launch_detect_intersection_sign_launched = False
-                    self.launch_detect_intersection_sign.shutdown()
-                else:
-                    pass
-        
-        # NODE: detect_parking && detect_parking_sign
-        elif launch_num == self.Launcher.launch_detect_parking.value:
-            if is_start == True:
-                if self.launch_detect_parking_launched == False:
-                    self.launch_detect_parking = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_parking = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_parking.launch"])
-                    self.launch_detect_parking_launched = True
-                    self.launch_detect_parking.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_parking_launched == True:
-                    self.launch_detect_parking_launched = False
-                    self.launch_detect_parking.shutdown()
-                else:
-                    pass 
-        elif launch_num == self.Launcher.launch_detect_parking_sign.value:
-            if is_start == True:
-                if self.launch_detect_parking_sign_launched == False:
-                    self.launch_detect_parking_sign = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_parking_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_parking_sign.launch"])
-                    self.launch_detect_parking_sign_launched = True
-                    self.launch_detect_parking_sign.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_parking_sign_launched == True:
-                    self.launch_detect_parking_sign_launched = False
-                    self.launch_detect_parking_sign.shutdown()
-                else:
-                    pass                              
-        
-        # NODE: detect_construction && detect_construction_sign
-        elif launch_num == self.Launcher.launch_detect_construction.value:
-            rospy.loginfo("START launch_detect_construction")
-            if is_start == True:
-                if self.launch_detect_construction_launched == False:
-                    self.launch_detect_construction = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_construction = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_construction.launch"])
-                    self.launch_detect_construction_launched = True
-                    self.launch_detect_construction.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_construction_launched == True:
-                    self.launch_detect_construction_launched = False
-                    self.launch_detect_construction.shutdown()
-                pass
-        elif launch_num == self.Launcher.launch_detect_construction_sign.value:
-            if is_start == True:
-                if self.launch_detect_construction_sign_launched == False:
-                    self.launch_detect_construction_sign = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_detect_construction_sign = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_detect/launch/detect_construction_sign.launch"])
-                    self.launch_detect_construction_sign_launched = True
-                    self.launch_detect_construction_sign.start()
-                else:
-                    pass
-            else:
-                if self.launch_detect_construction_sign_launched == True:
-                    self.launch_detect_construction_sign_launched = False
-                    self.launch_detect_construction_sign.shutdown()
-                else:
-                    pass    
-
-        # NODE: control_lane && control_moving
-        elif launch_num == self.Launcher.launch_control_lane.value:
-            if is_start == True:
-                if self.launch_control_lane_launched == False:
-                    self.launch_control_lane = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_control_lane = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_lane.launch"])
-                    self.launch_control_lane_launched = True
-                    self.launch_control_lane.start()
-                else:
-                    pass
-            else:
-                if self.launch_control_lane_launched == True:
-                    self.launch_control_lane_launched = False
-                    self.launch_control_lane.shutdown()
-                else:
-                    pass                  
-        elif launch_num == self.Launcher.launch_control_moving.value:
-            if is_start == True:
-                if self.launch_control_moving_launched == False:
-                    self.launch_control_moving = roslaunch.scriptapi.ROSLaunch()
-                    self.launch_control_moving = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + "turtlebot3_autorace_driving/launch/turtlebot3_autorace_control_moving.launch"])
-                    self.launch_control_moving_launched = True
-                    self.launch_control_moving.start()
-                else:
-                    pass
-            else:
-                if self.launch_control_moving_launched == True:
-                    self.launch_control_moving_launched = False
-                    self.launch_control_moving.shutdown()
-                pass
+        if is_start:
+            if not launch:
+                rospy.loginfo(f"Starting {node_name}")
+                launch = roslaunch.parent.ROSLaunchParent(self.uuid, [self.ros_package_path + f"turtlebot3_autorace_{node_name.split('_')[1]}/launch/{node_name}.launch"])
+                self.processes[launch_num] = launch
+                launch.start()
+        else:
+            if launch:
+                rospy.loginfo(f"Stopping {node_name}")
+                launch.shutdown()
+                self.processes[launch_num] = None
 
     def main(self):
         rospy.spin()
