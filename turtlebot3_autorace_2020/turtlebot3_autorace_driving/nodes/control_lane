@@ -37,7 +37,7 @@ class ControlLane:
         )
 
         self.lastError = 0
-        self.MAX_VEL = 0.5
+        self.MAX_VEL = 1
 
         rospy.on_shutdown(self.fnShutDown)
 
@@ -49,8 +49,8 @@ class ControlLane:
 
         error = center - 500
 
-        Kp = 0.0055
-        Kd = 0.009
+        Kp = 0.01
+        Kd = 0.02
 
         angular_z = Kp * error + Kd * (error - self.lastError)
         self.lastError = error
