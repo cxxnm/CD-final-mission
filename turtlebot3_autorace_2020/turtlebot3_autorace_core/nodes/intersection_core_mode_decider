@@ -43,9 +43,24 @@ class CoreModeDecider:
         )
 
         self.InvokedObject = Enum("InvokedObject", "traffic_sign")
-        self.TrafficSign = Enum("TrafficSign", "circle left parking")
+        self.TrafficSign = Enum(
+            "TrafficSign", 
+            (
+                "circle",
+                "left",
+                "parking",
+                "construction"
+            )
+        )
         self.CurrentMode = Enum(
-            "CurrentMode", "idle lane_following intersection parking"
+            'CurrentMode',
+            (
+                'idle',
+                'construction',
+                'intersection',
+                'lane_following',
+                'parking'
+            )
         )
 
         self.fnInitMode()
@@ -87,6 +102,12 @@ class CoreModeDecider:
                 ):  # parking sign deteced
                     self.current_mode = self.CurrentMode.parking.value
                     rospy.loginfo("detect sign : parking")
+                if (
+                    msg_data.data == self.TrafficSign.construction.value
+                ):  # construction sign deteced
+                    self.current_mode = self.CurrentMode.construction.value
+                    rospy.loginfo("detect sign : construction")
+
             else:
                 pass
             self.fnPublishMode()
