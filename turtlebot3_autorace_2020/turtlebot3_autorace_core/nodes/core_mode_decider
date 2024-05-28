@@ -66,6 +66,12 @@ class CoreModeDecider:
                 elif msg_data.data == self.TrafficSign.construction.value:
                     self.current_mode = self.CurrentMode.construction.value 
                     rospy.loginfo("Detected sign: construction")
+                elif msg_data.data == self.TrafficSign.stop.value:
+                    self.current_mode = self.CurrentMode.stop.value 
+                    rospy.loginfo("Detected sign: stop")
+                elif msg_data.data == self.TrafficSign.left.value:
+                    self.current_mode = self.CurrentMode.left.value 
+                    rospy.loginfo("Detected sign: left")
 
             self.fnPublishMode()
 
