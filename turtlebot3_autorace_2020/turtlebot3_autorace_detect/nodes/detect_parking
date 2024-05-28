@@ -36,7 +36,17 @@ class DetectParking():
         self.pub_moving = rospy.Publisher('/control/moving/state', MovingParam, queue_size= 1)
         self.pub_max_vel = rospy.Publisher('/control/max_vel', Float64, queue_size = 1)
 
-        self.StepOfParking = Enum('StepOfParking', 'parking exit')
+        # STEPS
+        self.Step = Enum(
+            'Step', 
+            (
+                'find_obstacle',
+                'avoid_obstacle',
+                'circling',
+                'parking',
+                'exit'
+            )
+        )
         self.is_moving_complete = False
 
     def cbMovingComplete(self, data):
@@ -45,7 +55,7 @@ class DetectParking():
     def cbParkingOrder(self, order):
         msg_pub_parking_return = UInt8()
         rospy.loginfo("[o]: PARKING ORDER")
-        if order.data == self.StepOfParking.parking.value:                              
+        if order.data == self.Step.parking.value:                              
             rospy.loginfo("Now motion")
             msg_pub_max_vel = Float64()
             msg_pub_max_vel.data = 0.00
@@ -79,11 +89,11 @@ class DetectParking():
             rospy.sleep(1)
 
             rospy.loginfo("parking finished")
-            msg_pub_parking_return.data = self.StepOfParking.exit.value
+            msg_pub_parking_return.data = self.Step.exit.value
 
-        elif order.data == self.StepOfParking.exit.value:            
+        elif order.data == self.Step.exit.value:            
             rospy.loginfo("parking finished")
-            msg_pub_parking_return.data = self.StepOfParking.exit.value
+            msg_pub_parking_return.data = self.Step.exit.value
 
         self.pub_parking_return.publish(msg_pub_parking_return)
         rospy.sleep(3)

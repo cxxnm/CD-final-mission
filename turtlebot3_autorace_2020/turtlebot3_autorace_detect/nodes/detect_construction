@@ -37,7 +37,17 @@ class DetectContruction():
         self.pub_moving = rospy.Publisher('/control/moving/state', MovingParam, queue_size= 1)
         self.pub_max_vel = rospy.Publisher('/control/max_vel', Float64, queue_size = 1)
        
-        self.StepOfConstruction = Enum('StepOfConstruction', 'find_obstacle avoid_obstacle exit')
+        # STEPS
+        self.Step = Enum(
+            'Step', 
+            (
+                'find_obstacle',
+                'avoid_obstacle',
+                'circling',
+                'parking',
+                'exit'
+            )
+        )
         self.is_obstacle_detected = False
         self.is_moving_complete = False
 
@@ -47,7 +57,7 @@ class DetectContruction():
     def cbConstructionOrder(self, order):
         msg_pub_construction_return = UInt8()
         rospy.loginfo("[o]: CONSTRUCTION ORDER")
-        if order.data == self.StepOfConstruction.find_obstacle.value:
+        if order.data == self.Step.find_obstacle.value:
             rospy.loginfo("find obstacle")
 
             while True:
@@ -63,9 +73,9 @@ class DetectContruction():
 
             rospy.sleep(1)
 
-            msg_pub_construction_return.data = self.StepOfConstruction.avoid_obstacle.value
+            msg_pub_construction_return.data = self.Step.avoid_obstacle.value
 
-        elif order.data == self.StepOfConstruction.avoid_obstacle.value:
+        elif order.data == self.Step.avoid_obstacle.value:
             rospy.loginfo("avoid obstacle")
             rospy.loginfo("go left")
             msg_moving = MovingParam()
@@ -187,11 +197,11 @@ class DetectContruction():
             self.is_moving_complete = False
 
             rospy.loginfo("construction finished")
-            msg_pub_construction_return.data = self.StepOfConstruction.exit.value        
+            msg_pub_construction_return.data = self.Step.exit.value        
 
-        elif order.data == self.StepOfConstruction.exit.value:
+        elif order.data == self.Step.exit.value:
             rospy.loginfo("construction finished")
-            msg_pub_construction_return.data = self.StepOfConstruction.exit.value
+            msg_pub_construction_return.data = self.Step.exit.value
 
         self.pub_construction_return.publish(msg_pub_construction_return)
         rospy.sleep(3)
