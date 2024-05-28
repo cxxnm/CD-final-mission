@@ -68,7 +68,6 @@ class CoreModeDecider:
 
     # Invoke if traffic sign is detected
     def cbInvokedByTrafficSign(self, traffic_sign_type_msg):
-        rospy.loginfo("invoke sign")
         self.fnDecideMode(
             self.InvokedObject.traffic_sign.value, traffic_sign_type_msg
         )
@@ -88,7 +87,6 @@ class CoreModeDecider:
         self, invoked_object, msg_data
     ):  # starts only when the traffic sign / traffic light is detected & current_mode is lane_following
         if self.current_mode == self.CurrentMode.lane_following.value:
-            rospy.loginfo("lane_following")
             if (
                 invoked_object == self.InvokedObject.traffic_sign.value
             ):  # Any Sign detected

@@ -173,8 +173,6 @@ class CoreNodeController():
         self.is_triggered = True
 
     def fnControlNode(self): 
-        rospy.loginfo("Control node triggered. Current mode: %s", self.current_mode)
-
         # start 
         if self.current_mode == self.CurrentMode.start.value:
             rospy.loginfo("Start MISSION!")
@@ -201,8 +199,6 @@ class CoreNodeController():
 
         # lane_following
         elif self.current_mode == self.CurrentMode.lane_following.value:
-            rospy.loginfo("New trigger for lane_following")
-
             self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
             self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
 
@@ -220,12 +216,8 @@ class CoreNodeController():
 
         # intersection
         elif self.current_mode == self.CurrentMode.intersection.value:
-            rospy.loginfo("New trigger for intersection")
             msg_pub_intersection_order = UInt8()
             if self.current_step_intersection == self.Step.circling.value:
-                rospy.loginfo("Current step: circling")
-                rospy.loginfo("Next step: exit")
-
                 msg_pub_intersection_order.data = self.Step.circling.value
 
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
@@ -237,8 +229,8 @@ class CoreNodeController():
                 self.fnLaunch(self.Launcher.launch_control_moving.value, True)
 
             elif self.current_step_intersection == self.Step.exit.value:
-                rospy.loginfo("Current step: exit")
                 msg_pub_intersection_order.data = self.Step.exit.value
+
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
 
                 self.fnLaunch(self.Launcher.launch_detect_intersection_sign.value, True)
@@ -252,63 +244,73 @@ class CoreNodeController():
         
         # parking
         elif self.current_mode == self.CurrentMode.parking.value:
-            rospy.loginfo("New trigger for parking")
             msg_pub_parking_order = UInt8()
             if self.current_step_parking == self.Step.parking.value:
-                rospy.loginfo("Current step: parking")
-                rospy.loginfo("Next step: finish parking")
                 msg_pub_parking_order.data = self.Step.parking.value
+
                 self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+
                 self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, False)
                 self.fnLaunch(self.Launcher.launch_detect_parking.value, True)
+
                 self.fnLaunch(self.Launcher.launch_control_lane.value, False)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, True)
+
             elif self.current_step_parking == self.Step.exit.value:
-                rospy.loginfo("Current step: finish parking")
                 msg_pub_parking_order.data = self.Step.exit.value
+
                 self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_parking.value, False)
+
                 self.fnLaunch(self.Launcher.launch_detect_parking_sign.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+
                 self.fnLaunch(self.Launcher.launch_control_lane.value, True)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+
             rospy.sleep(3)
             self.pub_parking_order.publish(msg_pub_parking_order)
 
         # construction
         elif self.current_mode == self.CurrentMode.construction.value:
-            rospy.loginfo("New trigger for construction")
             msg_pub_construction_order = UInt8()
             if self.current_step_construction == self.Step.find_obstacle.value:
-                rospy.loginfo("Current step: find_obstacle")
-                rospy.loginfo("Next step: avoid_obstacle")
                 msg_pub_construction_order.data = self.Step.find_obstacle.value
+
                 self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+
                 self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, False)
+
                 self.fnLaunch(self.Launcher.launch_control_lane.value, True)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+
             elif self.current_step_construction == self.Step.avoid_obstacle.value:
-                rospy.loginfo("Current step: avoid_obstacle")
-                rospy.loginfo("Next step: exit")
                 msg_pub_construction_order.data = self.Step.avoid_obstacle.value
+
                 self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+
                 self.fnLaunch(self.Launcher.launch_detect_construction.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, False)
+
                 self.fnLaunch(self.Launcher.launch_control_lane.value, False)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, True)
+
             elif self.current_step_construction == self.Step.exit.value:
-                rospy.loginfo("Current step: exit")
                 msg_pub_construction_order.data = self.Step.exit.value
+
                 self.fnLaunch(self.Launcher.launch_camera_ex_calib.value, True)
                 self.fnLaunch(self.Launcher.launch_detect_lane.value, True)
+
                 self.fnLaunch(self.Launcher.launch_detect_construction.value, False)
                 self.fnLaunch(self.Launcher.launch_detect_construction_sign.value, True)
+
                 self.fnLaunch(self.Launcher.launch_control_lane.value, True)
                 self.fnLaunch(self.Launcher.launch_control_moving.value, False)
+
             rospy.sleep(2)
             self.pub_construction_order.publish(msg_pub_construction_order)
 

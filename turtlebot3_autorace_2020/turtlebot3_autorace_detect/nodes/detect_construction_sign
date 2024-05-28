@@ -133,11 +133,10 @@ class DetectSign():
 
                 self.pub_traffic_sign.publish(msg_sign)
 
-                rospy.loginfo("construction")
+                rospy.loginfo("Construction found")
                 image_out_num = 2
         else:
             matches_construction = None
-            rospy.loginfo("not found")
       
         if image_out_num == 1:
             if self.pub_image_type == "compressed":

@@ -175,7 +175,6 @@ class DetectSign:
 
         else:
             matches_circle = None
-            # rospy.loginfo("nothing detected")
 
         good_left = []
         for m, n in matches_left:
@@ -203,7 +202,6 @@ class DetectSign:
 
         else:
             matches_left = None
-            # rospy.loginfo("nothing detected")
 
         if image_out_num == 1:
             if self.pub_image_type == "compressed":
