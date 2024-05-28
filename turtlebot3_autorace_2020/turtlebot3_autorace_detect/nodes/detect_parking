@@ -57,15 +57,27 @@ class DetectParking():
 
             rospy.sleep(1)
 
+            # Go forward
             rospy.loginfo("go straight")
             msg_moving = MovingParam()
-            msg_moving.moving_type= 4
-            msg_moving.moving_value_angular=0.0
-            msg_moving.moving_value_linear=0.35
+            msg_moving.moving_type = 4
+            msg_moving.moving_value_angular = 0.0
+            msg_moving.moving_value_linear = 0.35
             self.pub_moving.publish(msg_moving)
-            while True:
-                if self.is_moving_complete == True:
-                    break
+            while not self.is_moving_complete:
+                rospy.sleep(0.1)
+            self.is_moving_complete = False
+
+            rospy.sleep(1)
+
+            # Turn 180 degrees
+            rospy.loginfo("turn 180 degrees")
+            msg_moving.moving_type = 4
+            msg_moving.moving_value_angular = 3.14  # 180 degrees in radians
+            msg_moving.moving_value_linear = 0.0
+            self.pub_moving.publish(msg_moving)
+            while not self.is_moving_complete:
+                rospy.sleep(0.1)
             self.is_moving_complete = False
 
             rospy.sleep(1)
@@ -78,7 +90,7 @@ class DetectParking():
             msg_pub_parking_return.data = self.StepOfParking.exit.value
 
         self.pub_parking_return.publish(msg_pub_parking_return)
-        rospy.sleep(3)            
+        rospy.sleep(3)
 
     def cbScanObstacle(self, scan):
         angle_scan = 30
