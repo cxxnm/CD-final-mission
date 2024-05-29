@@ -120,7 +120,6 @@ class DetectIntersection:
                 self.is_moving_complete = False
 
                 rospy.sleep(1)
-
                 rospy.loginfo("go straight")
                 msg_moving = MovingParam()
                 msg_moving.moving_type= 4
@@ -179,7 +178,7 @@ class DetectIntersection:
                 msg_moving = MovingParam()
                 msg_moving.moving_type= 4
                 msg_moving.moving_value_angular= 60
-                msg_moving.moving_value_linear=0.20
+                msg_moving.moving_value_linear=0.28
                 self.pub_moving.publish(msg_moving)
                 while True:
                     if self.is_moving_complete == True:
@@ -220,7 +219,7 @@ class DetectIntersection:
                 rospy.loginfo("go left")
                 msg_moving = MovingParam()
                 msg_moving.moving_type = 2
-                msg_moving.moving_value_angular = 70
+                msg_moving.moving_value_angular = 60
                 msg_moving.moving_value_linear = 0.0
                 self.pub_moving.publish(msg_moving)
                 while True:
@@ -229,12 +228,11 @@ class DetectIntersection:
                 self.is_moving_complete = False
 
                 rospy.sleep(1)
-
                 rospy.loginfo("go straight")
                 msg_moving = MovingParam()
                 msg_moving.moving_type = 4
                 msg_moving.moving_value_angular = 0
-                msg_moving.moving_value_linear = 0.5
+                msg_moving.moving_value_linear = 0.45
                 self.pub_moving.publish(msg_moving)
                 while True:
                     if self.is_moving_complete == True:
