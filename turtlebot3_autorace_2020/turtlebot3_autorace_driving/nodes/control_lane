@@ -37,7 +37,7 @@ class ControlLane:
         )
 
         self.lastError = 0
-        self.MAX_VEL = 0.5
+        self.MAX_VEL = 0.1
 
         rospy.on_shutdown(self.fnShutDown)
 
@@ -59,16 +59,16 @@ class ControlLane:
         # twist.linear.x = 0.05
         try:
             twist.linear.x = min(
-                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.2), 0.04
+                self.MAX_VEL * ((1 - abs(error) / 500) ** 2.2), 0.02
             )
         except:
-            twist.linear.x = 0.04
+            twist.linear.x = 0.02
         twist.linear.y = 0
         twist.linear.z = 0
         twist.angular.x = 0
         twist.angular.y = 0
         twist.angular.z = (
-            -max(angular_z, -0.2) if angular_z < 0 else -min(angular_z, 0.2)
+            -max(angular_z, -0.1) if angular_z < 0 else -min(angular_z, 0.1)
         )
         self.pub_cmd_vel.publish(twist)
 
@@ -86,6 +86,12 @@ class ControlLane:
 
     def main(self):
         rospy.spin()
+
+if __name__ == '__main__':
+    rospy.init_node('control_lane')
+    node = ControlLane()
+    node.main()
+
 
 
 if __name__ == "__main__":
