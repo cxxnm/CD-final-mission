@@ -112,7 +112,7 @@ class DetectSign:
         )
         dir_path += "image/"
 
-        self.img_stop= cv2.imread(dir_path + "stop.png", 0)
+        self.img_stop = cv2.imread(dir_path + "stop.png", 0)
 
         self.kp_stop, self.des_stop = self.sift.detectAndCompute(
             self.img_stop, None
@@ -134,13 +134,6 @@ class DetectSign:
         return err
 
     def cbFindTrafficSign(self, image_msg):
-        # drop the frame to 1/5 (6fps) because of the processing speed. This is up to your computer's operating power.
-        if self.counter % 3 != 0:
-            self.counter += 1
-            return
-        else:
-            self.counter = 1
-
         if self.sub_image_type == "compressed":
             # converting compressed image to opencv image
             np_arr = np.frombuffer(image_msg.data, np.uint8)
@@ -148,8 +141,8 @@ class DetectSign:
         elif self.sub_image_type == "raw":
             cv_image_input = self.cvBridge.imgmsg_to_cv2(image_msg, "bgr8")
 
-        MIN_MATCH_COUNT = 5
-        MIN_MSE_DECISION = 40000
+        MIN_MATCH_COUNT = 9
+        MIN_MSE_DECISION = 3000
 
         # find the keypoints and descriptors with SIFT
         kp1, des1 = self.sift.detectAndCompute(cv_image_input, None)
@@ -158,11 +151,13 @@ class DetectSign:
 
         image_out_num = 1
 
-
         good_stop = []
         for m, n in matches_stop:
             if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
                 good_stop.append(m)
+
+        rospy.loginfo(f"Good stop: {len(good_stop)}")
+
         if len(good_stop) > MIN_MATCH_COUNT:
             src_pts = np.float32(
                 [kp1[m.queryIdx].pt for m in good_stop]
@@ -180,11 +175,13 @@ class DetectSign:
                 msg_sign.data = self.TrafficSign.stop.value
 
                 self.pub_traffic_sign.publish(msg_sign)
+                rospy.loginfo(f"MSE: {mse}")
                 rospy.loginfo("detect stop sign")
-                image_out_num = 3
+                image_out_num = 2
 
         else:
             matches_stop = None
+
 
         if image_out_num == 1:
             if self.pub_image_type == "compressed":
@@ -201,8 +198,7 @@ class DetectSign:
                     self.cvBridge.cv2_to_imgmsg(cv_image_input, "bgr8")
                 )
 
-
-        elif image_out_num == 3:
+        elif image_out_num == 2:
             draw_params_stop = dict(
                 matchColor=(255, 0, 0),  # draw matches in green color
                 singlePointColor=None,
@@ -231,6 +227,7 @@ class DetectSign:
                 self.pub_image_traffic_sign.publish(
                     self.cvBridge.cv2_to_imgmsg(final_stop, "bgr8")
                 )
+
 
     def main(self):
         rospy.spin()
