@@ -167,28 +167,24 @@ class CoreNodeController():
 
     def parking_mode(self):
         rospy.loginfo("PARKING MODE")
-        self.stop_lane_detection()
         msg_pub_parking_order = UInt8()
         msg_pub_parking_order.data = self.current_step_parking
         self.pub_parking_order.publish(msg_pub_parking_order)
     
     def left_mode(self):
         rospy.loginfo("LEFT MODE")
-        self.stop_lane_detection()
         msg_pub_left_order = UInt8()
         msg_pub_left_order.data = self.current_step_left
         self.pub_left_order.publish(msg_pub_left_order)
     
     def stopping_mode(self):
         rospy.loginfo("STOPPING MODE")
-        self.stop_lane_detection()
         msg_pub_stopping_order = UInt8()
         msg_pub_stopping_order.data = self.current_step_stopping
         self.pub_stopping_order.publish(msg_pub_stopping_order)
 
     def construction_mode(self):
         rospy.loginfo("CONSTRUCTION MODE")
-        self.stop_lane_detection()
         msg_pub_construction_order = UInt8()
         msg_pub_construction_order.data = self.current_step_construction
         self.pub_construction_order.publish(msg_pub_construction_order)
