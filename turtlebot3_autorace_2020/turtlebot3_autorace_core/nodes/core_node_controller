@@ -117,7 +117,7 @@ class CoreNodeController():
     def cbStopStamped(self, stopping_msg):
         rospy.loginfo(f"Stopping step changed to: {stopping_msg.data}")
         self.current_step_stopping = stopping_msg.data
-        self.checkExitCondition(stopping_msg.data, self.pub_stopping_order)
+        self.checkExitCondition(stopping_msg.data, self.pub_stop_order)
 
     def checkExitCondition(self, step, pub):
         if step == self.Step.exit.value:
@@ -181,7 +181,7 @@ class CoreNodeController():
         rospy.loginfo("STOPPING MODE")
         msg_pub_stopping_order = UInt8()
         msg_pub_stopping_order.data = self.current_step_stopping
-        self.pub_stopping_order.publish(msg_pub_stopping_order)
+        self.pub_stop_order.publish(msg_pub_stopping_order)
 
     def construction_mode(self):
         rospy.loginfo("CONSTRUCTION MODE")
