@@ -123,7 +123,6 @@ class DetectSign():
 
         else:
             matches_stop = None
-            rospy.loginfo("nothing")
 
         if image_out_num == 1:
             if self.pub_image_type == "compressed":
