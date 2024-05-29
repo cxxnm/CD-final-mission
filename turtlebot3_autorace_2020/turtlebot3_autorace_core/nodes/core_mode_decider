@@ -56,10 +56,10 @@ class CoreModeDecider:
                 rospy.loginfo("Traffic sign detected")
                 if msg_data.data == self.TrafficSign.circle.value:
                     self.current_mode = self.CurrentMode.intersection.value 
-                    rospy.loginfo("Detected sign: circle/intersection")
+                    rospy.loginfo("Detected sign: circle")
                 elif msg_data.data == self.TrafficSign.left.value:
-                    self.current_mode = self.CurrentMode.intersection.value 
-                    rospy.loginfo("Detected sign: left/intersection")
+                    self.current_mode = self.CurrentMode.left.value 
+                    rospy.loginfo("Detected sign: left")
                 elif msg_data.data == self.TrafficSign.parking.value:
                     self.current_mode = self.CurrentMode.parking.value 
                     rospy.loginfo("Detected sign: parking")
@@ -69,9 +69,6 @@ class CoreModeDecider:
                 elif msg_data.data == self.TrafficSign.stop.value:
                     self.current_mode = self.CurrentMode.stop.value 
                     rospy.loginfo("Detected sign: stop")
-                elif msg_data.data == self.TrafficSign.left.value:
-                    self.current_mode = self.CurrentMode.left.value 
-                    rospy.loginfo("Detected sign: left")
 
             self.fnPublishMode()
 
