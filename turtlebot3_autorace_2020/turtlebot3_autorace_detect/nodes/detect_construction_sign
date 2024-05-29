@@ -170,6 +170,7 @@ class DetectSign:
             matches_construction = mask.ravel().tolist()
 
             mse = self.fnCalcMSE(src_pts, dst_pts)
+            rospy.loginfo(f"MSE test: {mse}")
             if mse < MIN_MSE_DECISION:
                 msg_sign = UInt8()
                 msg_sign.data = self.TrafficSign.construction.value
