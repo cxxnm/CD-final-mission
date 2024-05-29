@@ -162,6 +162,9 @@ class DetectSign:
         for m, n in matches_circle:
             if m.distance < 0.6 * n.distance:  # lowered from 0.7 to 0.6
                 good_circle.append(m)
+
+        rospy.loginfo(f"Good circle: {len(good_circle)}")
+
         if len(good_circle) > MIN_MATCH_COUNT:
             src_pts = np.float32(
                 [kp1[m.queryIdx].pt for m in good_circle]
@@ -179,6 +182,7 @@ class DetectSign:
                 msg_sign.data = self.TrafficSign.circle.value
 
                 self.pub_traffic_sign.publish(msg_sign)
+                rospy.loginfo(f"MSE: {mse}")
                 rospy.loginfo("detect circle sign")
                 image_out_num = 2
 

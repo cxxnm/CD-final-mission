@@ -117,9 +117,13 @@ class DetectSign():
         image_out_num = 1
 
         good_construction = []
+
         for m, n in matches_construction:
             if m.distance < ratio_test_threshold * n.distance:
                 good_construction.append(m)
+
+        rospy.loginfo(f"Good construction: {len(good_construction)}")
+
         if len(good_construction)>MIN_MATCH_COUNT:
                 src_pts = np.float32(
                     [kp1[m.queryIdx].pt for m in good_construction]
@@ -132,11 +136,13 @@ class DetectSign():
                 matches_construction = mask.ravel().tolist()
 
                 mse = self.fnCalcMSE(src_pts, dst_pts)
+
                 if mse < MIN_MSE_DECISION:
                     msg_sign = UInt8()
                     msg_sign.data = self.TrafficSign.construction.value
 
                     self.pub_traffic_sign.publish(msg_sign)
+                    rospy.loginfo(f"MSE: {mse}")
                     rospy.loginfo("detect construction sign")
                     image_out_num = 2
         else:
